@@ -7,9 +7,13 @@ Due Dates
 
 (10/10) Deliverables II: Software Requirements Specifications
 
+(10/29 - 10/31) Midterm Project Presentations (SRS & Design)
+
 (10/31) Deliverables III: High-Level Design and Detailed Design
 
 (11/14) Deliverables IV: Test Plan
+
+(11/26 & 12/3) Team Project Demos
 
 (12/3) Deliverables V: Test Results, User's Manual, Source Code, Build Instructions, Individual Lessons Learned
 
