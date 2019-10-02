@@ -1,4 +1,4 @@
-# OnlineDietitian
+# Online Dietitian
 Group project for Processes for Object-Oriented Software
 
 Due Dates
