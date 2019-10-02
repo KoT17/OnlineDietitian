@@ -17,6 +17,8 @@ Due Dates
 
 (12/3) Deliverables V: Test Results, User's Manual, Source Code, Build Instructions, Individual Lessons Learned
 
+(12/10) Final Exam 10:00AM - 12:50PM
+
 Quizzes
 -------
 (9/17 - 9/19) Quiz 1: Chapter 1-3
