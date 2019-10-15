@@ -3,7 +3,7 @@
 #include <Wt/WText.h>
 
 using namespace Wt;
-
+/*
 class ControlExample : public WApplication {
 public:
 	ControlExample(const WEnvironment& env) : WApplication(env) {
@@ -18,5 +18,6 @@ WApplication* createApplication(const WEnvironment& env) {
 }
 
 int main(int argc, char** argv) {
-	return WRun(argc, argv, &createApplication);
+	return WRun(argc, argv, createApplication());
 }
+*/

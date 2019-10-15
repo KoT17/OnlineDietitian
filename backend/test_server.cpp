@@ -1,25 +1,28 @@
-// Documentation (https://downloads.mysql.com/docs/connector-cpp-8.0-en.pdf)
-// Chapter 2-4 for installation and Chapter 5 for building
-
 #include <stdlib.h>
 #include <iostream>
 #include <mysql.h>
-
-// This include is not properly being set 
-// with current additional directories (MySQL/MySQL Server 8.0/include and MySQL/Connector C++ 8.0/lib64)
-// There needs to be an include or build that allows for this include to work.
 #include <mysqlx/xdevapi.h>
 
 using namespace std;
+using namespace mysqlx;
 
-// Current code is outdated MySQL code for MySQL 1.1
-// Will update when xdevapi functions
+// Current code is MySQL code for Database Connection
 int main() {
-	sql::mysql::MySQL_Driver* driver;
-	sql::Connection* con;
 
-	driver = sql::mysql::get_mysql_driver_instance();
-	con = driver->connect("tcp://127.0.0.1:3306", "user", "password");
+	// Scope controls life-time of objects such as session or schema
 
-	delete con;
+	{
+		Session sess("localhost", 33060, "user", "password");
+		Schema db = sess.getSchema("test");
+		// or Schema db(sess, "test");
+
+		Collection myColl = db.getCollection("my_collection");
+		// or Collection myColl(db, "my_collection");
+
+		DocResult myDocs = myColl.find("name like :param")
+			.limit(1)
+			.bind("param", "S%").execute();
+
+		cout << myDocs.fetchOne();
+	}
 }
