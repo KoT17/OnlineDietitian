@@ -1,1 +1,14 @@
-<app-main-nav></app-main-nav>
+<app-main-nav>
+  <div fxLayout="column" fxFlex>
+    <!-- <mat-progress-bar *ngIf="showLoader" mode="indeterminate" fxFlex="0 0 4px"></mat-progress-bar> -->
+    <div fxFlex="3"></div>
+    <div fxFlex="94" fxLayout="row">
+      <div fxFlex="3"></div>
+      <div fxFlex="94">
+        <router-outlet></router-outlet>
+      </div>
+      <div fxFlex="3"></div>
+    </div>
+    <div fxFlex="3"></div>
+  </div>
+</app-main-nav>
