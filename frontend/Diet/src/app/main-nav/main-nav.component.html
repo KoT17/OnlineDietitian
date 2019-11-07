@@ -4,13 +4,13 @@
       [mode]="(isHandset$ | async) ? 'over' : 'side'"
       [opened]="(isHandset$ | async) === false">
     <mat-toolbar color="primary">Menu</mat-toolbar>
-    <mat-nav-list *ngIf="isLoggedIn">
+    <mat-nav-list *ngIf="signInService.getIsLoggedIn()">
       <a mat-list-item routerLink="/authhome">Home</a>
       <a mat-list-item routerLink="/manage">Manage</a>
       <a mat-list-item routerLink="/contactUs">Contact Us</a>
-      <a mat-list-item href="#">Sign out</a>
+      <a mat-list-item routerLink="/home" (click)="signInService.setIsLoggedIn(false)">Sign out</a>
     </mat-nav-list>
-    <mat-nav-list *ngIf="!isLoggedIn">
+    <mat-nav-list *ngIf="!signInService.getIsLoggedIn()">
       <a mat-list-item routerLink="/home">Home</a>
       <a mat-list-item routerLink="/services">Services</a>
       <a mat-list-item routerLink="/contactUs">Contact Us</a>

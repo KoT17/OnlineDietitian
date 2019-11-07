@@ -18,6 +18,14 @@ import { SignInComponent } from './sign-in/sign-in.component';
 import { ManageComponent } from './manage/manage.component';
 import { UserHomeComponent } from './user-home/user-home.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { MatCardModule } from '@angular/material/card';
+import { MatInputModule } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { MatDialogModule } from "@angular/material";
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { RouterModule } from '@angular/router';
+import { RegisterComponent } from './register/register.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +36,8 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     ContactComponent,
     SignInComponent,
     ManageComponent,
-    UserHomeComponent
+    UserHomeComponent,
+    RegisterComponent
   ],
   imports: [
     BrowserModule,
@@ -40,7 +49,14 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     MatSidenavModule,
     MatIconModule,
     MatListModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    MatCardModule,
+    MatInputModule,
+    FormsModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatProgressSpinnerModule,
+    RouterModule
   ],
   providers: [],
   bootstrap: [AppComponent]
