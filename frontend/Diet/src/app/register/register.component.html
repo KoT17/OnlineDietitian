@@ -1,1 +1,23 @@
-<p>register works!</p>
+<div class="mat-elevation-z2" style="padding: 3em" fxLayout="column" fxLayoutAlign="start stretch" fxFill>
+  <h1 class="mat-h1" fxLayoutAlign="center center">Register</h1>
+    <form fxLayout="row" fxLayoutAlign="center center">
+      <div fxLayout="column" fxLayoutAlign="center stretch" fxFlex="50">
+        <mat-form-field>
+          <input matInput placeholder="Name" type="text">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Email" type="email">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Password" type="password">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Confirm Password" type="password">
+        </mat-form-field>
+        <div fxLayout="row" fxLayoutAlign="space-between stretch" fxLayoutGap=".2em">
+          <button mat-raised-button color="primary" type="reset" fxFlex="50">Reset</button>
+          <button mat-raised-button (click)="register()" color="primary" fxFlex="50">Register</button>
+        </div>
+      </div>
+    </form>
+</div>

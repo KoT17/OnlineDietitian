@@ -24,8 +24,12 @@ import { FormsModule } from '@angular/forms';
 import { MatDialogModule } from "@angular/material";
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 import { RouterModule } from '@angular/router';
 import { RegisterComponent } from './register/register.component';
+import { SurveyComponent } from './survey/survey.component';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @NgModule({
   declarations: [
@@ -37,7 +41,8 @@ import { RegisterComponent } from './register/register.component';
     SignInComponent,
     ManageComponent,
     UserHomeComponent,
-    RegisterComponent
+    RegisterComponent,
+    SurveyComponent
   ],
   imports: [
     BrowserModule,
@@ -56,7 +61,10 @@ import { RegisterComponent } from './register/register.component';
     MatDialogModule,
     MatFormFieldModule,
     MatProgressSpinnerModule,
-    RouterModule
+    MatSelectModule,
+    RouterModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   providers: [],
   bootstrap: [AppComponent]

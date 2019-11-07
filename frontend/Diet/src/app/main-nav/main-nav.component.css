@@ -6,6 +6,15 @@
   width: 200px;
 }
 
+.sidenav-content-div {
+  overflow: hidden;
+  height: 100%;
+}
+
+.contentScroll {
+  overflow: none;
+}
+
 .mat-toolbar.mat-primary {
   position: sticky;
   top: 0;
