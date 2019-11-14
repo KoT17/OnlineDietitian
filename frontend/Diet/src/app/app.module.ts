@@ -30,6 +30,8 @@ import { RegisterComponent } from './register/register.component';
 import { SurveyComponent } from './survey/survey.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatStepperModule } from '@angular/material/stepper';
 
 @NgModule({
   declarations: [
@@ -64,7 +66,9 @@ import { MatNativeDateModule } from '@angular/material/core';
     MatSelectModule,
     RouterModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    MatExpansionModule,
+    MatStepperModule
   ],
   providers: [],
   bootstrap: [AppComponent]
