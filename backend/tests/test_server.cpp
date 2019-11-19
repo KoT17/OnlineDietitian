@@ -6,33 +6,27 @@
 using namespace std;
 using namespace mysqlx;
 
-// Current code is MySQL code for Database Connection
+int test_all_units();
+int test_database_insert();
+int test_database_connection();
+int test_database_delete();
+
 int main() {
+	test_all_units();
+	return 0;
+}
 
-	// Scope controls life-time of objects such as session or schema
-
+int test_all_units() {
 	try{
-		Session sess("localhost", 33060, "root", "root");
-		Schema db = sess.getSchema("testdb");
-		// or Schema db(sess, "test");
-
-		// Create a new collection 'my_collection'
-		Collection myColl = db.createCollection("my_collection");
-
-		// Insert documents
-		myColl.add(R"({"name": "Nadya", "age": 54})").execute();
-		myColl.add(R"({"name": "Laurie", "age": 19})").execute();
-		myColl.add(R"({"name": "Lukas", "age": 32})").execute();
-
-		// Find a document
-		DocResult docs = myColl.find("name like :param1 AND age < :param2").limit(1)
-			.bind("param1", "N%").bind("param2", 60).execute();
-
-		// Print document
-		cout << docs.fetchOne();
-
-		// Drop the collection
-		db.dropCollection("my_collection");
+		int errors = 0;
+		errors += test_database_connection();
+		errors += test_database_insert();
+		errors += test_database_delete();
+		if (errors == 0)
+			cout << "Tests passed successfully with 0 errors" << endl;
+		else
+			cout << "Tests passed failed with " << errors << " errors" << endl;
+		return 0;
 	}
 	catch (const Error & err)
 	{
@@ -46,4 +40,42 @@ int main() {
 	{
 		cout << "EXCEPTION: " << ex << endl;
 	}
+}
+
+int test_database_connection() {
+	Session sess("localhost", 33060, "root", "root");
+	Schema db = sess.getSchema("testdb");
+
+	Table table = db.getTable("test_table");
+
+	assert(table.getSchema().getName() == "testdb");
+	assert(table.getName() == "test_table");
+
+	return !(table.getSchema().getName() == "testdb");
+}
+
+int test_database_insert() {
+	Session sess("localhost", 33060, "root", "root");
+	Schema db = sess.getSchema("testdb");
+
+	Table table = db.getTable("test_table");
+	table.insert("Name", "Number").values("Doritos", 20).execute();
+
+	assert(table.count() == 1);
+	table.remove().execute();
+	return !(table.count() == 0);
+}
+
+int test_database_delete() {
+	Session sess("localhost", 33060, "root", "root");
+	Schema db = sess.getSchema("testdb");
+
+
+	Table table = db.getTable("test_table");
+	table.insert("Name", "Number").values("Doritos", 20).execute();
+
+	assert(table.count() == 1);
+	table.remove().where("Name='Doritos'").execute();
+	assert(table.count() == 0);
+	return !(table.count() == 0);
 }
