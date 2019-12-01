@@ -8,6 +8,8 @@ import { ManageComponent } from './manage/manage.component';
 import { SignInComponent } from './sign-in/sign-in.component';
 import { RegisterComponent } from './register/register.component';
 import { SurveyComponent } from './survey/survey.component';
+import { PickdietComponent } from './pickdiet/pickdiet.component';
+
 
 const routes: Routes = [
   { path: "home", component: HomeComponent },
@@ -18,8 +20,9 @@ const routes: Routes = [
   { path: "manage", component: ManageComponent },
   { path: "signIn", component: SignInComponent },
   { path: "reg", component: RegisterComponent },
-  { path: "survey", component: SurveyComponent }
-];
+  { path: "survey", component: SurveyComponent },
+  { path: "pick", component: PickdietComponent }
+  ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

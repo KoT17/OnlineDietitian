@@ -32,6 +32,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatStepperModule } from '@angular/material/stepper';
+import { PickdietComponent } from './pickdiet/pickdiet.component';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import { MatStepperModule } from '@angular/material/stepper';
     ManageComponent,
     UserHomeComponent,
     RegisterComponent,
-    SurveyComponent
+    SurveyComponent,
+    PickdietComponent
   ],
   imports: [
     BrowserModule,

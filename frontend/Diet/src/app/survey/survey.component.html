@@ -29,9 +29,6 @@
           <mat-option value="Vegetarian">Vegetarian</mat-option>
           <mat-option value="Vegan">Vegan</mat-option>
           <mat-option value="Gluten-Free">Gluten-Free</mat-option>
-          <mat-option value="Peanut Allergy">Peanut Allergy</mat-option>
-          <mat-option value="Milk Allergy">Milk Allergy</mat-option>
-          <mat-option value="Shellfish Allergy">Shellfish Allergy</mat-option>
         </mat-select>
       </mat-form-field>
       <mat-form-field>
@@ -45,7 +42,7 @@
       </mat-form-field>
       <div fxLayout="row" fxLayoutAlign="space-between stretch" fxLayoutGap=".2em">
         <button mat-raised-button color="primary" type="reset" fxFlex="50">Reset</button>
-        <button mat-raised-button (click)="register()" color="primary" fxFlex="50">Submit</button>
+        <button mat-raised-button (click)="submit()" color="primary" fxFlex="50">Submit</button>
       </div>
     </form>
 </div>
