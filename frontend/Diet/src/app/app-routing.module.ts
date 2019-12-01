@@ -17,7 +17,7 @@ const routes: Routes = [
   { path: "authhome", component: UserHomeComponent },
   { path: "contactUs", component: ContactComponent },
   { path: "services", component: ServicesComponent },
-  { path: "manage", component: ManageComponent },
+  { path: "manage", component: SurveyComponent },
   { path: "signIn", component: SignInComponent },
   { path: "reg", component: RegisterComponent },
   { path: "survey", component: SurveyComponent },

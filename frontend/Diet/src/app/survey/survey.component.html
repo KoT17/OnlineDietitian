@@ -1,6 +1,6 @@
 <div fxLayout="column" fxFill>
     <form class="mat-elevation-z2 container" style="padding: 20px" fxLayout="column" fxFlex>
-      <h1 class="mat-h1 no-margin no-padding" fxLayoutAlign="center center">Tell us more!</h1>
+      <h1 class="mat-h1 no-margin no-padding" fxLayoutAlign="center center">{{title}}</h1>
       <mat-form-field *ngIf="!signInService.getIsLoggedIn()">
         <input matInput placeholder="Email" type="email">
       </mat-form-field>

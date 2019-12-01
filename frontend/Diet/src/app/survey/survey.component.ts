@@ -8,8 +8,14 @@ import { Router } from '@angular/router';
   styleUrls: ['./survey.component.css']
 })
 export class SurveyComponent implements OnInit {
-
-  constructor(private signInService: SignInService, private router: Router) { }
+  title: string;
+  constructor(private signInService: SignInService, private router: Router) {
+    if(router.url == "/manage") {
+      this.title = "Update your information!"
+    } else {
+      this.title = "Tell us more!";
+    }
+  }
 
   ngOnInit() {
   }

@@ -1,3 +1,20 @@
-<div fxLayout="column" fxLayoutAlign="start start" fxFill>
-  <p>services works!</p>
+<div fxLayout="column" fxFill>
+    <form class="mat-elevation-z2 container" style="padding: 20px" fxLayout="column" fxFlex>
+      <h1 class="mat-h1 no-margin no-padding" fxLayoutAlign="center center">Services</h1>
+      <mat-form-field class="example-full-width"  fxFlex="20">
+          <input type="text" placeholder="Pick one" aria-label="Number" matInput [formControl]="myControl" [matAutocomplete]="auto">
+          <mat-autocomplete #auto="matAutocomplete">
+            <mat-option *ngFor="let option of filteredOptions | async" [value]="option" (click)="doSomething(option)">
+              {{option}}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+        <div style="padding: 50px" *ngIf="selection.length > 0" class="mat-elevation-z2" fxFlex="80">
+          <h2 class="mat-h2">{{selection}}</h2>
+          <p class="mat-body"><b>Calories: </b>161</p>
+          <p class="mat-body"><b>Fat: </b>0.2 grams</p>
+          <p class="mat-body"><b>Protein: </b>4.3 grams</p>
+          <p class="mat-body"><b>Carbs: </b>37 grams</p>
+        </div>
+    </form>
 </div>
