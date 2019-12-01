@@ -1,20 +1,21 @@
 <div fxLayout="column" fxFill>
     <form class="mat-elevation-z2 container" style="padding: 20px" fxLayout="column" fxFlex>
-      <h1 class="mat-h1 no-margin no-padding" fxLayoutAlign="center center">Services</h1>
-      <mat-form-field class="example-full-width"  fxFlex="20">
-          <input type="text" placeholder="Pick one" aria-label="Number" matInput [formControl]="myControl" [matAutocomplete]="auto">
+      <h1 class="mat-h1 no-margin no-padding" fxLayoutAlign="center center">Nutritional Information</h1>
+      <h4 class="mat-h4 no-margin no-padding" fxLayoutAlign="start center">Search below for a specific food's nutritional value!</h4>
+      <mat-form-field class="example-full-width"  fxFlex="10">
+          <input type="text" placeholder="Search" aria-label="Number" matInput [formControl]="myControl" [matAutocomplete]="auto">
           <mat-autocomplete #auto="matAutocomplete">
             <mat-option *ngFor="let option of filteredOptions | async" [value]="option" (click)="doSomething(option)">
               {{option}}
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>
-        <div style="padding: 50px" *ngIf="selection.length > 0" class="mat-elevation-z2" fxFlex="80">
-          <h2 class="mat-h2">{{selection}}</h2>
-          <p class="mat-body"><b>Calories: </b>161</p>
-          <p class="mat-body"><b>Fat: </b>0.2 grams</p>
-          <p class="mat-body"><b>Protein: </b>4.3 grams</p>
-          <p class="mat-body"><b>Carbs: </b>37 grams</p>
+        <div style="padding: 50px; background-color: rgba(63, 81, 181, .5)" *ngIf="selection" class="mat-elevation-z2" fxFlex="90">
+          <h2 class="mat-h2">{{selection.name}}</h2>
+          <p class="mat-body"><b>Calories: </b>{{selection.calories}}</p>
+          <p class="mat-body"><b>Fat: </b>{{selection.fat}} grams</p>
+          <p class="mat-body"><b>Protein: </b>{{selection.protein}} grams</p>
+          <p class="mat-body"><b>Carbs: </b>{{selection.carbs}} grams</p>
         </div>
     </form>
 </div>

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {FormControl} from '@angular/forms';
 import {Observable} from 'rxjs';
-import {map, startWith} from 'rxjs/operators';
+import {map, startWith, take} from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-services',
@@ -9,20 +10,28 @@ import {map, startWith} from 'rxjs/operators';
   styleUrls: ['./services.component.css']
 })
 export class ServicesComponent implements OnInit {
-options: string[] = ['Carrot', 'Rice', 'Potato', 'Chicken Breast', 'Egg', 'Water'];
+options: string[] = [];
   filteredOptions: Observable<string[]>;
   myControl = new FormControl();
   selection: string = '';
-  constructor() {
+  food;
+  constructor(private http: HttpClient) {
 
   }
 
   ngOnInit() {
-    this.filteredOptions = this.myControl.valueChanges
-      .pipe(
-        startWith(''),
-        map(value => this._filter(value))
-      );
+    // *************** INSERT URL HERE ****************
+    this.http.get("http://localhost:3000/food").pipe(take(1)).subscribe(food => {
+        this.food = Object.values(food);
+        Object.values(food).forEach(item => {
+          this.options.push(item.name);
+        });
+        this.filteredOptions = this.myControl.valueChanges
+          .pipe(
+            startWith(''),
+            map(value => this._filter(value))
+          );
+    });
   }
 
   private _filter(value: string): string[] {
@@ -32,6 +41,10 @@ options: string[] = ['Carrot', 'Rice', 'Potato', 'Chicken Breast', 'Egg', 'Water
   }
 
   doSomething(selection) {
-    this.selection = selection;
+    this.food.forEach(item => {
+      if(item.name == selection) {
+        this.selection = item;
+      }
+    });
   }
 }
