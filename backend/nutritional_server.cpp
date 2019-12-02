@@ -37,6 +37,28 @@ void NutritionalServer::handle_get(http_request message) {
 	ucout << message.to_string() << endl;
 	json::value food = json::value::object();
 
+	utility::string_t sourceField = utility::conversions::to_string_t("source");
+	utility::string_t userField = utility::conversions::to_string_t("user");
+	utility::string_t passField = utility::conversions::to_string_t("password");
+
+	utility::string_t source = (message.headers().find(sourceField))->second;
+	utility::string_t username = (message.headers().find(userField))->second;
+	utility::string_t password = (message.headers().find(passField))->second;
+
+	// No login information required for this block
+	if (strcmp(utility::conversions::to_utf8string(source).c_str(), "lookup") == 0) {
+		ucout << "GET Nutritional Lookup has been hit" << endl;
+	}
+
+	// Login information required for this block
+	if (strcmp(utility::conversions::to_utf8string(source).c_str(), "user_info") == 0) {
+		ucout << "GET User Info has been hit" << endl;
+	}
+
+	// Login information required for this block
+	if (strcmp(utility::conversions::to_utf8string(source).c_str(), "diet_choice") == 0) {
+		ucout << "GET Diet Choices has been hit" << endl;
+	}
 	message.reply(status_codes::OK);
 }
 
