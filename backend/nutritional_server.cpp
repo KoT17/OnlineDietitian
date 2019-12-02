@@ -189,11 +189,24 @@ void NutritionalServer::handle_post(http_request message) {
 		}
 		catch (const Error & err) {
 			cout << "ERROR: " << err << endl;
-			message.reply(status_codes::NotAcceptable); // May need to be modified to ensure for proper reply
+			message.reply(status_codes::NotAcceptable, res.extract_json(false).get());
 		}
 
+		jsonReturn[L"email"] = json::value::string(utility::conversions::to_utf16string(email));
+		jsonReturn[L"height"] = json::value::string(utility::conversions::to_utf16string(height));
+		jsonReturn[L"weight"] = json::value::string(utility::conversions::to_utf16string(weight));
+		jsonReturn[L"gender"] = json::value::string(utility::conversions::to_utf16string(gender));
+		jsonReturn[L"DOB"] = json::value::string(utility::conversions::to_utf16string(DOB));
+		jsonReturn[L"lvlOfActivity"] = json::value::string(utility::conversions::to_utf16string(activity));
+		jsonReturn[L"dietaryRestriction"] = json::value::string(utility::conversions::to_utf16string(restrict));
+		jsonReturn[L"user"][L"email"] = json::value::string(utility::conversions::to_utf16string(email));
+
 		ucout << "Survey information has been updated" << endl;
-		message.reply(status_codes::OK);
+		res.set_body(jsonReturn);
+
+		json::value response = res.extract_json(false).get();
+
+		message.reply(status_codes::OK, response);
 	}
 	else if (strcmp(utility::conversions::to_utf8string(source).c_str(), "selection") == 0) {
 		utility::string_t emailField = utility::conversions::to_string_t("email");
@@ -227,6 +240,8 @@ void NutritionalServer::handle_post(http_request message) {
 			cout << "ERROR: " << err << endl;
 			message.reply(status_codes::NotAcceptable, res.extract_json(false).get()); 
 		}
+
+		ucout << "Server failed to update user diet plan" << endl;
 		message.reply(status_codes::NotAcceptable, res.extract_json(false).get());
 	}
 
