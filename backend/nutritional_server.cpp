@@ -78,6 +78,7 @@ void NutritionalServer::handle_post(http_request message) {
 	utility::string_t password = (message.headers().find(passField))->second;
 
 	json::value jsonReturn;
+	json::value error;
 	http_response res;
 	http_client client(L"http://localhost:4200/NutritionalLookup");
 
@@ -96,16 +97,19 @@ void NutritionalServer::handle_post(http_request message) {
 
 			jsonReturn[L"email"] = json::value::string(utility::conversions::to_utf16string(email));
 			jsonReturn[L"password"] = json::value::string(utility::conversions::to_utf16string(password));
-
 			res.set_body(jsonReturn);
-
 			json::value response = res.extract_json(false).get();
 
 			message.reply(status_codes::OK, response);
 		}
 		else {
-			ucout << "Username or Password is incorrect" << endl;
-			message.reply(status_codes::Unauthorized, json::value()); // returns an empty JSON meaning that login failed
+			ucout << "Email or Password is incorrect" << endl;
+
+			error[L"error"] = json::value::string(utility::conversions::to_utf16string("Email or Password is not correct"));
+			res.set_body(error);
+			json::value errorJson = res.extract_json(false).get();
+
+			message.reply(status_codes::NotAcceptable, errorJson);
 		}
 	}
 	else if (strcmp(utility::conversions::to_utf8string(source).c_str(), "registration") == 0) {
@@ -122,11 +126,18 @@ void NutritionalServer::handle_post(http_request message) {
 		Table table = db.getTable("users");
 		int count = table.count();
 		try {
-			table.insert("username", "password", "first_name", "last_name", "email").values(convertToStd(username), convertToStd(password), convertToStd(fName), convertToStd(lName), convertToStd(email)).execute();
+			table.insert("username", "password", "first_name", "last_name", "email")
+				.values(convertToStd(username), convertToStd(password), convertToStd(fName), convertToStd(lName), convertToStd(email))
+				.execute();
 		}
 		catch (const Error & err) {
 			cout << "ERROR: " << err << endl;
-			message.reply(status_codes::NotAcceptable, json::value()); 
+
+			error[L"error"] = json::value::string(utility::conversions::to_utf16string("Username or Email is not unique"));
+			res.set_body(error);
+			json::value errorJson = res.extract_json(false).get();
+
+			message.reply(status_codes::NotAcceptable, errorJson);
 		}
 
 		// Set up the response of the user's information as a json 
@@ -145,7 +156,12 @@ void NutritionalServer::handle_post(http_request message) {
 		}
 		else {
 			ucout << "Username or Email is not unique" << endl;
-			message.reply(status_codes::Conflict, res.extract_json(false).get());
+
+			error[L"error"] = json::value::string(utility::conversions::to_utf16string("Username or Email is not unique"));
+			res.set_body(error);
+			json::value errorJson = res.extract_json(false).get();
+
+			message.reply(status_codes::NotAcceptable, errorJson);
 		}
 	}
 	else if (strcmp(utility::conversions::to_utf8string(source).c_str(), "survey") == 0) {
@@ -189,7 +205,12 @@ void NutritionalServer::handle_post(http_request message) {
 		}
 		catch (const Error & err) {
 			cout << "ERROR: " << err << endl;
-			message.reply(status_codes::NotAcceptable, res.extract_json(false).get());
+
+			error[L"error"] = json::value::string(utility::conversions::to_utf16string("Table failed on updating user values"));
+			res.set_body(error);
+			json::value errorJson = res.extract_json(false).get();
+
+			message.reply(status_codes::BadGateway, errorJson);
 		}
 
 		jsonReturn[L"email"] = json::value::string(utility::conversions::to_utf16string(email));
@@ -238,7 +259,12 @@ void NutritionalServer::handle_post(http_request message) {
 		}
 		catch (const Error & err) {
 			cout << "ERROR: " << err << endl;
-			message.reply(status_codes::NotAcceptable, res.extract_json(false).get()); 
+
+			error[L"error"] = json::value::string(utility::conversions::to_utf16string("Updating the User diet plan failed"));
+			res.set_body(error);
+			json::value errorJson = res.extract_json(false).get();
+
+			message.reply(status_codes::BadGateway, errorJson);
 		}
 		message.reply(status_codes::OK, res.extract_json(false).get());
 	}
