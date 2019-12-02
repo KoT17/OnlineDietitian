@@ -23,9 +23,11 @@ using namespace http::experimental::listener;
 
 std::unique_ptr<NutritionalServer> g_http;
 
+pplx::task<json::value> HTTPPostAsync();
+
 void on_initialize(const string_t& address)
 {
-	// Build our listener's URI from the configured address and the hard-coded path "MyServer/Action"
+	// Create a listener for requests at "http://localhost:4200/NutritionalLookup"
 
 	uri_builder uri(address);
 	uri.append_path(U("NutritionalLookup"));
@@ -45,22 +47,6 @@ void on_shutdown()
 	return;
 }
 
-// I don't believe this works but I am placing it to show current progress
-
-//pplx::task<json::value> HTTPPostAsync() {
-//	http_client client(L"http://localhost:4200/NutritionalLookup");
-//
-//	return client.request(methods::POST).then([](http_response response) -> pplx::task<json::value> {
-//		if (response.status_code() == status_codes::OK) {
-//			ucout << "Successfully got OK from POST request" << endl;
-//			return response.extract_json();
-//		}
-//		else {
-//			return pplx::task_from_result(json::value());
-//		}
-//		});
-//}
-
 int wmain(int argc, wchar_t* argv[])
 {
 	utility::string_t port = U("4200");
@@ -74,6 +60,8 @@ int wmain(int argc, wchar_t* argv[])
 
 	on_initialize(address);
 	std::cout << "Press ENTER to exit." << std::endl;
+
+	// Add handler here? 
 
 	std::string line;
 	std::getline(std::cin, line);

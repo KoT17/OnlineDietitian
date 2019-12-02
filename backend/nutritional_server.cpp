@@ -91,19 +91,21 @@ void NutritionalServer::handle_post(http_request message) {
 
 		Row userRow = table.select().where("email like :email AND password like :password").bind("email", convertToStd(email)).bind("password", utility::conversions::to_utf8string(password)).execute().fetchOne();
 
-		// Sending back the response, need to figure out where to send this as a response. May need handler in main? 
-		jsonReturn[L"email"] = json::value::string(utility::conversions::to_utf16string(email));
-		jsonReturn[L"password"] = json::value::string(utility::conversions::to_utf16string(password));
-
-		res.set_body(jsonReturn);
-
-		pplx::task<json::value> response = res.extract_json(false);
-
 		if (!userRow.isNull()) {
 			ucout << "A JSON has been returned to the client from login page" << endl;
+
+			jsonReturn[L"email"] = json::value::string(utility::conversions::to_utf16string(email));
+			jsonReturn[L"password"] = json::value::string(utility::conversions::to_utf16string(password));
+
+			res.set_body(jsonReturn);
+
+			json::value response = res.extract_json(false).get();
+
+			message.reply(status_codes::OK, response);
 		}
 		else {
 			ucout << "Username or Password is incorrect" << endl;
+			message.reply(status_codes::Unauthorized, json::value()); // returns an empty JSON meaning that login failed
 		}
 	}
 	else if (strcmp(utility::conversions::to_utf8string(source).c_str(), "registration") == 0) {
@@ -124,15 +126,26 @@ void NutritionalServer::handle_post(http_request message) {
 		}
 		catch (const Error & err) {
 			cout << "ERROR: " << err << endl;
-			message.reply(status_codes::NotAcceptable); // May need to be modified to ensure for proper reply
+			message.reply(status_codes::NotAcceptable, json::value()); 
 		}
 
 		// Set up the response of the user's information as a json 
 		if (table.count() == (count + 1)) {
 			ucout << "User has successfully registered" << endl;
+
+			jsonReturn[L"name"] = json::value::string(utility::conversions::to_utf16string(username));
+			jsonReturn[L"email"] = json::value::string(utility::conversions::to_utf16string(email));
+			jsonReturn[L"password"] = json::value::string(utility::conversions::to_utf16string(password));
+
+			res.set_body(jsonReturn);
+
+			json::value response = res.extract_json(false).get();
+
+			message.reply(status_codes::OK, response);
 		}
 		else {
 			ucout << "Username or Email is not unique" << endl;
+			message.reply(status_codes::Conflict, res.extract_json(false).get());
 		}
 	}
 	else if (strcmp(utility::conversions::to_utf8string(source).c_str(), "survey") == 0) {
@@ -176,11 +189,24 @@ void NutritionalServer::handle_post(http_request message) {
 		}
 		catch (const Error & err) {
 			cout << "ERROR: " << err << endl;
-			message.reply(status_codes::NotAcceptable); // May need to be modified to ensure for proper reply
+			message.reply(status_codes::NotAcceptable, res.extract_json(false).get());
 		}
 
+		jsonReturn[L"email"] = json::value::string(utility::conversions::to_utf16string(email));
+		jsonReturn[L"height"] = json::value::string(utility::conversions::to_utf16string(height));
+		jsonReturn[L"weight"] = json::value::string(utility::conversions::to_utf16string(weight));
+		jsonReturn[L"gender"] = json::value::string(utility::conversions::to_utf16string(gender));
+		jsonReturn[L"DOB"] = json::value::string(utility::conversions::to_utf16string(DOB));
+		jsonReturn[L"lvlOfActivity"] = json::value::string(utility::conversions::to_utf16string(activity));
+		jsonReturn[L"dietaryRestriction"] = json::value::string(utility::conversions::to_utf16string(restrict));
+		jsonReturn[L"user"][L"email"] = json::value::string(utility::conversions::to_utf16string(email));
+
 		ucout << "Survey information has been updated" << endl;
-		message.reply(status_codes::OK);
+		res.set_body(jsonReturn);
+
+		json::value response = res.extract_json(false).get();
+
+		message.reply(status_codes::OK, response);
 	}
 	else if (strcmp(utility::conversions::to_utf8string(source).c_str(), "selection") == 0) {
 		utility::string_t emailField = utility::conversions::to_string_t("email");
@@ -194,16 +220,27 @@ void NutritionalServer::handle_post(http_request message) {
 		Table table = db.getTable("users");
 
 		try {
+
 			table.update()
 				.set("diet_plan_id", convertToStd(diet))
 				.where("username like :username").bind("username", convertToStd(username))
 				.execute();
+
+			jsonReturn[L"email"] = json::value::string(utility::conversions::to_utf16string(email));
+			jsonReturn[L"diet"] = json::value::string(utility::conversions::to_utf16string(diet));
+
+			res.set_body(jsonReturn);
+
+			json::value response = res.extract_json(false).get();
+
+			ucout << "User has updated their diet plan " << endl;
+			message.reply(status_codes::OK, response);
 		}
 		catch (const Error & err) {
 			cout << "ERROR: " << err << endl;
-			message.reply(status_codes::NotAcceptable); // May need to be modified to ensure for proper reply
+			message.reply(status_codes::NotAcceptable, res.extract_json(false).get()); 
 		}
-		message.reply(status_codes::OK);
+		message.reply(status_codes::OK, res.extract_json(false).get());
 	}
 
 }
