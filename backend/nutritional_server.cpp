@@ -42,10 +42,17 @@ void NutritionalServer::handle_put(http_request message) {
 
 void NutritionalServer::handle_post(http_request message) {
 	ucout << message.to_string() << endl;
-	ucout << "Information about the headers: " << message.headers().size() << endl;
-	utility::string_t user = utility::conversions::to_string_t("user");
-	http_headers::iterator it = message.headers().find(user);
-	utility::string_t username = it->second;
+	utility::string_t sourceField = utility::conversions::to_string_t("source");
+	utility::string_t userField = utility::conversions::to_string_t("user");
+	utility::string_t passField = utility::conversions::to_string_t("password");
+
+	utility::string_t source = (message.headers().find(sourceField))->second;
+	utility::string_t username = (message.headers().find(userField))->second;
+	utility::string_t password = (message.headers().find(passField))->second;
+	
+	if (strcmp(utility::conversions::to_utf8string(source).c_str(), "login") == 0) {
+		ucout << "Login has been hit" << endl;
+	}
 	ucout << username << endl; 
 	message.reply(status_codes::OK);
 }
