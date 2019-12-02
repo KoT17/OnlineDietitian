@@ -21,6 +21,8 @@ using namespace web::http::client;
 using namespace concurrency::streams;
 using namespace http::experimental::listener;
 
+std::string convertToStd(utility::string_t str);
+
 NutritionalServer::NutritionalServer(utility::string_t url) : listener(url) {
 	listener.support(methods::GET, std::bind(&NutritionalServer::handle_get, this, std::placeholders::_1));
 	listener.support(methods::PUT, std::bind(&NutritionalServer::handle_put, this, std::placeholders::_1));
@@ -52,17 +54,46 @@ void NutritionalServer::handle_post(http_request message) {
 	
 	if (strcmp(utility::conversions::to_utf8string(source).c_str(), "login") == 0) {
 		utility::string_t emailField = utility::conversions::to_string_t("email");
+
+		utility::string_t email = (message.headers().find(emailField))->second;
 		Session sess("localhost", 33060, "root", "root");
 		Schema db = sess.getSchema("user_db");
 		Table table = db.getTable("users");
 
-		Row userRow = table.select().where("username like :username AND password like :password").bind("username", utility::conversions::to_utf8string(username)).bind("password", utility::conversions::to_utf8string(password)).execute().fetchOne();
+		Row userRow = table.select().where("email like :email AND password like :password").bind("email", convertToStd(email)).bind("password", utility::conversions::to_utf8string(password)).execute().fetchOne();
 
 		if (userRow.isNull()) {
 			ucout << "Username or Password is incorrect" << endl;
 		}
 		else {
 			ucout << "User has an account and can log in" << endl;
+		}
+	}
+	else if (strcmp(utility::conversions::to_utf8string(source).c_str(), "registration") == 0) {
+		utility::string_t emailField = utility::conversions::to_string_t("email");
+		utility::string_t fNameField = utility::conversions::to_string_t("fName");
+		utility::string_t lNameField = utility::conversions::to_string_t("lName");
+
+		utility::string_t email = (message.headers().find(emailField))->second;
+		utility::string_t fName = (message.headers().find(fNameField))->second;
+		utility::string_t lName = (message.headers().find(lNameField))->second;
+	
+		Session sess("localhost", 33060, "root", "root");
+		Schema db = sess.getSchema("user_db");
+		Table table = db.getTable("users");
+		int count = table.count();
+		try {
+			table.insert("username", "password", "first_name", "last_name", "email").values(convertToStd(username), convertToStd(password), convertToStd(fName), convertToStd(lName), convertToStd(email)).execute();
+		} 
+		catch (const Error & err) {
+			cout << "ERROR: " << err << endl;
+			message.reply(status_codes::NotAcceptable);
+		}
+		if (table.count() == (count + 1)) {
+			ucout << "User has successfully regestered" << endl;
+		}
+		else {
+			ucout << "Username or Email is not unique" << endl;
 		}
 	}
 	message.reply(status_codes::OK);
@@ -73,9 +104,10 @@ void NutritionalServer::handle_delete(http_request message) {
 	message.reply(status_codes::OK);
 }
 
-int nutritional_json_creation() {
-
+std::string convertToStd(utility::string_t str) {
+	return utility::conversions::to_utf8string(str);
 }
+
 int nutritional_load() {
 
 	try {
