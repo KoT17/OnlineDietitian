@@ -2,10 +2,55 @@
 #include <iostream>
 #include <mysql.h>
 #include <mysqlx/xdevapi.h>
+#include <cpprest/http_client.h>
+#include <cpprest/filestream.h>
+#include <cpprest/http_listener.h> 
+#include <cpprest/json.h>  
+#include <cpprest/uri.h>
+#include <cpprest/asyncrt_utils.h>
+#include "NutritionalServer.h"
+
 
 using namespace std;
 using namespace mysqlx;
+using namespace utility;                    
+using namespace web;        
+using namespace pplx;
+using namespace web::http;                  
+using namespace web::http::client;          
+using namespace concurrency::streams;
+using namespace http::experimental::listener;
 
+NutritionalServer::NutritionalServer(utility::string_t url) : listener(url) {
+	listener.support(methods::GET, std::bind(&NutritionalServer::handle_get, this, std::placeholders::_1));
+	listener.support(methods::PUT, std::bind(&NutritionalServer::handle_put, this, std::placeholders::_1));
+	listener.support(methods::POST, std::bind(&NutritionalServer::handle_post, this, std::placeholders::_1));
+	listener.support(methods::DEL, std::bind(&NutritionalServer::handle_delete, this, std::placeholders::_1));
+}
+
+void NutritionalServer::handle_get(http_request message) {
+	ucout << message.to_string() << endl;
+	message.reply(status_codes::OK);
+}
+
+void NutritionalServer::handle_put(http_request message) {
+	ucout << message.to_string() << endl;
+	message.reply(status_codes::OK);
+}
+
+void NutritionalServer::handle_post(http_request message) {
+	ucout << message.to_string() << endl;
+	message.reply(status_codes::OK);
+}
+
+void NutritionalServer::handle_delete(http_request message) {
+	ucout << message.to_string() << endl;
+	message.reply(status_codes::OK);
+}
+
+int nutritional_json_creation() {
+
+}
 int nutritional_load() {
 
 	// When REST apk is installed, this code should work under a GET from the nutritional page
