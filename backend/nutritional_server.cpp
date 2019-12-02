@@ -15,11 +15,11 @@
 
 using namespace std;
 using namespace mysqlx;
-using namespace utility;                    
-using namespace web;        
+using namespace utility;
+using namespace web;
 using namespace pplx;
-using namespace web::http;                  
-using namespace web::http::client;          
+using namespace web::http;
+using namespace web::http::client;
 using namespace concurrency::streams;
 using namespace http::experimental::listener;
 
@@ -54,7 +54,11 @@ void NutritionalServer::handle_post(http_request message) {
 	utility::string_t source = (message.headers().find(sourceField))->second;
 	utility::string_t username = (message.headers().find(userField))->second;
 	utility::string_t password = (message.headers().find(passField))->second;
-	
+
+	json::value jsonReturn;
+	http_response res;
+	http_client client(L"http://localhost:4200/NutritionalLookup");
+
 	if (strcmp(utility::conversions::to_utf8string(source).c_str(), "login") == 0) {
 		utility::string_t emailField = utility::conversions::to_string_t("email");
 
@@ -65,13 +69,21 @@ void NutritionalServer::handle_post(http_request message) {
 
 		Row userRow = table.select().where("email like :email AND password like :password").bind("email", convertToStd(email)).bind("password", utility::conversions::to_utf8string(password)).execute().fetchOne();
 
-		if (userRow.isNull()) {
-			ucout << "Username or Password is incorrect" << endl;
+		// Sending back the response, need to figure out where to send this as a response. May need handler in main? 
+		jsonReturn[L"email"] = json::value::string(utility::conversions::to_utf16string(email));
+		jsonReturn[L"password"] = json::value::string(utility::conversions::to_utf16string(password));
+
+		res.set_body(jsonReturn);
+
+		pplx::task<json::value> response = res.extract_json(false);
+
+		if (!userRow.isNull()) {
+			ucout << "A JSON has been returned to the client from login page" << endl;
 		}
 		else {
-			ucout << "User has an account and can log in" << endl;
+			ucout << "Username or Password is incorrect" << endl;
 		}
-	} 
+	}
 	else if (strcmp(utility::conversions::to_utf8string(source).c_str(), "registration") == 0) {
 		utility::string_t emailField = utility::conversions::to_string_t("email");
 		utility::string_t fNameField = utility::conversions::to_string_t("fName");
@@ -80,14 +92,14 @@ void NutritionalServer::handle_post(http_request message) {
 		utility::string_t email = (message.headers().find(emailField))->second;
 		utility::string_t fName = (message.headers().find(fNameField))->second;
 		utility::string_t lName = (message.headers().find(lNameField))->second;
-	
+
 		Session sess("localhost", 33060, "root", "root");
 		Schema db = sess.getSchema("user_db");
 		Table table = db.getTable("users");
 		int count = table.count();
 		try {
 			table.insert("username", "password", "first_name", "last_name", "email").values(convertToStd(username), convertToStd(password), convertToStd(fName), convertToStd(lName), convertToStd(email)).execute();
-		} 
+		}
 		catch (const Error & err) {
 			cout << "ERROR: " << err << endl;
 			message.reply(status_codes::NotAcceptable); // May need to be modified to ensure for proper reply
@@ -118,10 +130,10 @@ void NutritionalServer::handle_post(http_request message) {
 		utility::string_t activity = (message.headers().find(activityField))->second;
 		utility::string_t restrict = (message.headers().find(restrictField))->second;
 
-		int birthYear = stoi(convertToStd(DOB).substr(0,4));
+		int birthYear = stoi(convertToStd(DOB).substr(0, 4));
 		int birthMonth = stoi(convertToStd(DOB).substr(5, 6));
 		int birthDay = stoi(convertToStd(DOB).substr(8, 9));
-		
+
 		int currentYear = stoi(convertToStd(datetime::utc_now().to_string()).substr(11, 15));
 
 		Session sess("localhost", 33060, "root", "root");
@@ -134,7 +146,7 @@ void NutritionalServer::handle_post(http_request message) {
 				.set("height", convertToStd(height))
 				.set("gender", convertToStd(gender))
 				.set("age", currentYear - birthYear)
-				.set("BMI", calculateBMI(weight,height))
+				.set("BMI", calculateBMI(weight, height))
 				.set("activity_level", convertToStd(activity))
 				.set("diet_restriction", convertToStd(restrict))
 				.where("username like :username").bind("username", convertToStd(username))
@@ -171,7 +183,7 @@ void NutritionalServer::handle_post(http_request message) {
 		}
 		message.reply(status_codes::OK);
 	}
-	
+
 }
 
 void NutritionalServer::handle_delete(http_request message) {
@@ -208,8 +220,8 @@ int nutritional_load() {
 
 		cout << "Connected to food DB" << endl;
 
-		list<Row> values =  table.select().execute().fetchAll();
-		
+		list<Row> values = table.select().execute().fetchAll();
+
 		cout << "ID\tNAME\t\tCALORIES\tFAT\tCARBS\tPROTEIN\tSERVING SIZE" << endl;
 
 		for (list<Row>::iterator it = values.begin(); it != values.end(); it++) {

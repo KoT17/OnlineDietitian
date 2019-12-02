@@ -45,6 +45,22 @@ void on_shutdown()
 	return;
 }
 
+// I don't believe this works but I am placing it to show current progress
+
+//pplx::task<json::value> HTTPPostAsync() {
+//	http_client client(L"http://localhost:4200/NutritionalLookup");
+//
+//	return client.request(methods::POST).then([](http_response response) -> pplx::task<json::value> {
+//		if (response.status_code() == status_codes::OK) {
+//			ucout << "Successfully got OK from POST request" << endl;
+//			return response.extract_json();
+//		}
+//		else {
+//			return pplx::task_from_result(json::value());
+//		}
+//		});
+//}
+
 int wmain(int argc, wchar_t* argv[])
 {
 	utility::string_t port = U("4200");
