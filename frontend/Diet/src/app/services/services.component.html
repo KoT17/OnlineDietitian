@@ -1,7 +1,8 @@
 <div fxLayout="column" fxFill>
     <form class="mat-elevation-z2 container" style="padding: 20px" fxLayout="column" fxFlex>
       <h1 class="mat-h1 no-margin no-padding" fxLayoutAlign="center center">Nutritional Information</h1>
-      <h4 class="mat-h4 no-margin no-padding" fxLayoutAlign="start center">Search below for a specific food's nutritional value!</h4>
+      <h4 class="mat-h4 no-margin no-padding" fxLayoutAlign="center center">Search below for a specific food's nutritional value!</h4>
+      <div fxLayoutAlign="center center"><img src="../assets/foodborder.png" fxFlex="100"></div>
       <mat-form-field class="example-full-width"  fxFlex="10">
           <input type="text" placeholder="Search" aria-label="Number" matInput [formControl]="myControl" [matAutocomplete]="auto">
           <mat-autocomplete #auto="matAutocomplete">
