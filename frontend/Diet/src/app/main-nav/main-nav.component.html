@@ -3,24 +3,24 @@
       [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
       [mode]="(isHandset$ | async) ? 'over' : 'side'"
       [opened]="(isHandset$ | async) === false">
-    <mat-toolbar color="primary">Menu</mat-toolbar>
+    <mat-toolbar color="primary"><mat-icon>menu</mat-icon><div fxFlex="0 0 10px"></div>Menu</mat-toolbar>
     <mat-nav-list *ngIf="signInService.getIsLoggedIn()">
-      <a mat-list-item routerLink="/authhome">Home</a>
-      <a mat-list-item routerLink="/services">Services</a>
-      <a mat-list-item routerLink="/manage">Manage</a>
-      <a mat-list-item routerLink="/contactUs">Contact Us</a>
-      <a mat-list-item routerLink="/home" (click)="signInService.setIsLoggedIn(false)">Sign out</a>
+      <a mat-list-item routerLink="/authhome"><mat-icon>home</mat-icon><div fxFlex="0 0 10px"></div>Home</a>
+      <a mat-list-item routerLink="/services"><mat-icon>scatter_plot</mat-icon><div fxFlex="0 0 10px"></div>Services</a>
+      <a mat-list-item routerLink="/manage"><mat-icon>build</mat-icon><div fxFlex="0 0 10px"></div>Manage</a>
+      <a mat-list-item routerLink="/contactUs"><mat-icon>contact_support</mat-icon><div fxFlex="0 0 10px"></div>Contact Us</a>
+      <a mat-list-item routerLink="/home" (click)="signInService.setIsLoggedIn(false)"><mat-icon>account_circle</mat-icon><div fxFlex="0 0 10px"></div>Sign out</a>
     </mat-nav-list>
     <mat-nav-list *ngIf="!signInService.getIsLoggedIn()">
-      <a mat-list-item routerLink="/home">Home</a>
-      <a mat-list-item routerLink="/services">Services</a>
-      <a mat-list-item routerLink="/contactUs">Contact Us</a>
-      <a mat-list-item routerLink="/signIn">Sign in</a>
+      <a mat-list-item routerLink="/home"><mat-icon>home</mat-icon><div fxFlex="0 0 10px"></div>Home</a>
+      <a mat-list-item routerLink="/services"><mat-icon>scatter_plot</mat-icon><div fxFlex="0 0 10px"></div>Services</a>
+      <a mat-list-item routerLink="/contactUs"><mat-icon>contact_support</mat-icon><div fxFlex="0 0 10px"></div>Contact Us</a>
+      <a mat-list-item routerLink="/signIn"><mat-icon>account_circle</mat-icon><div fxFlex="0 0 10px"></div>Sign in</a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
     <div class="sidenav-content-div" fxLayout="column">
-      <mat-toolbar color="primary">
+      <mat-toolbar color="primary"fxLayoutAlign="center center">
         <button
           type="button"
           aria-label="Toggle sidenav"
