@@ -11,7 +11,7 @@ int test_database_insert();
 int test_database_connection();
 int test_database_delete();
 
-int main() {
+int test() {
 	test_all_units();
 	return 0;
 }

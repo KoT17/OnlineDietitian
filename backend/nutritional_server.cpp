@@ -30,6 +30,8 @@ NutritionalServer::NutritionalServer(utility::string_t url) : listener(url) {
 
 void NutritionalServer::handle_get(http_request message) {
 	ucout << message.to_string() << endl;
+	json::value food = json::value::object();
+
 	message.reply(status_codes::OK);
 }
 
@@ -40,6 +42,11 @@ void NutritionalServer::handle_put(http_request message) {
 
 void NutritionalServer::handle_post(http_request message) {
 	ucout << message.to_string() << endl;
+	ucout << "Information about the headers: " << message.headers().size() << endl;
+	utility::string_t user = utility::conversions::to_string_t("user");
+	http_headers::iterator it = message.headers().find(user);
+	utility::string_t username = it->second;
+	ucout << username << endl; 
 	message.reply(status_codes::OK);
 }
 
@@ -53,7 +60,6 @@ int nutritional_json_creation() {
 }
 int nutritional_load() {
 
-	// When REST apk is installed, this code should work under a GET from the nutritional page
 	try {
 		Session sess("localhost", 33060, "root", "root");
 		Schema db = sess.getSchema("OnlineDietitian");
