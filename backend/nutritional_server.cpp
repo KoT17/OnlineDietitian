@@ -51,9 +51,20 @@ void NutritionalServer::handle_post(http_request message) {
 	utility::string_t password = (message.headers().find(passField))->second;
 	
 	if (strcmp(utility::conversions::to_utf8string(source).c_str(), "login") == 0) {
-		ucout << "Login has been hit" << endl;
+		utility::string_t emailField = utility::conversions::to_string_t("email");
+		Session sess("localhost", 33060, "root", "root");
+		Schema db = sess.getSchema("user_db");
+		Table table = db.getTable("users");
+
+		Row userRow = table.select().where("username like :username AND password like :password").bind("username", utility::conversions::to_utf8string(username)).bind("password", utility::conversions::to_utf8string(password)).execute().fetchOne();
+
+		if (userRow.isNull()) {
+			ucout << "Username or Password is incorrect" << endl;
+		}
+		else {
+			ucout << "User has an account and can log in" << endl;
+		}
 	}
-	ucout << username << endl; 
 	message.reply(status_codes::OK);
 }
 
