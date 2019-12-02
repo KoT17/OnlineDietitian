@@ -91,19 +91,21 @@ void NutritionalServer::handle_post(http_request message) {
 
 		Row userRow = table.select().where("email like :email AND password like :password").bind("email", convertToStd(email)).bind("password", utility::conversions::to_utf8string(password)).execute().fetchOne();
 
-		// Sending back the response, need to figure out where to send this as a response. May need handler in main? 
-		jsonReturn[L"email"] = json::value::string(utility::conversions::to_utf16string(email));
-		jsonReturn[L"password"] = json::value::string(utility::conversions::to_utf16string(password));
-
-		res.set_body(jsonReturn);
-
-		pplx::task<json::value> response = res.extract_json(false);
-
 		if (!userRow.isNull()) {
 			ucout << "A JSON has been returned to the client from login page" << endl;
+
+			jsonReturn[L"email"] = json::value::string(utility::conversions::to_utf16string(email));
+			jsonReturn[L"password"] = json::value::string(utility::conversions::to_utf16string(password));
+
+			res.set_body(jsonReturn);
+
+			json::value response = res.extract_json(false).get();
+
+			message.reply(status_codes::OK, response);
 		}
 		else {
 			ucout << "Username or Password is incorrect" << endl;
+			message.reply(status_codes::Unauthorized, json::value()); // return 
 		}
 	}
 	else if (strcmp(utility::conversions::to_utf8string(source).c_str(), "registration") == 0) {
