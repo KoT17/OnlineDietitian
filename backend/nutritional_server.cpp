@@ -240,9 +240,7 @@ void NutritionalServer::handle_post(http_request message) {
 			cout << "ERROR: " << err << endl;
 			message.reply(status_codes::NotAcceptable, res.extract_json(false).get()); 
 		}
-
-		ucout << "Server failed to update user diet plan" << endl;
-		message.reply(status_codes::NotAcceptable, res.extract_json(false).get());
+		message.reply(status_codes::OK, res.extract_json(false).get());
 	}
 
 }
