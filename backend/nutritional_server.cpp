@@ -24,6 +24,7 @@ using namespace concurrency::streams;
 using namespace http::experimental::listener;
 
 std::string convertToStd(utility::string_t str);
+float calculateBMI(utility::string_t weight, utility::string_t height);
 
 NutritionalServer::NutritionalServer(utility::string_t url) : listener(url) {
 	listener.support(methods::GET, std::bind(&NutritionalServer::handle_get, this, std::placeholders::_1));
@@ -129,11 +130,11 @@ void NutritionalServer::handle_post(http_request message) {
 
 		try {
 			table.update()
-				.set("height", convertToStd(height))
 				.set("weight", convertToStd(weight))
+				.set("height", convertToStd(height))
 				.set("gender", convertToStd(gender))
 				.set("age", currentYear - birthYear)
-				.set("BMI", (703 * stoi(convertToStd(weight))) / pow(stoi(convertToStd(height)), 2))
+				.set("BMI", calculateBMI(weight,height))
 				.set("activity_level", convertToStd(activity))
 				.set("diet_restriction", convertToStd(restrict))
 				.where("username like :username").bind("username", convertToStd(username))
@@ -145,8 +146,32 @@ void NutritionalServer::handle_post(http_request message) {
 		}
 
 		ucout << "Survey information has been updated" << endl;
+		message.reply(status_codes::OK);
 	}
-	message.reply(status_codes::OK);
+	else if (strcmp(utility::conversions::to_utf8string(source).c_str(), "selection") == 0) {
+		utility::string_t emailField = utility::conversions::to_string_t("email");
+		utility::string_t dietField = utility::conversions::to_string_t("diet");
+
+		utility::string_t email = (message.headers().find(emailField))->second;
+		utility::string_t diet = (message.headers().find(dietField))->second;
+
+		Session sess("localhost", 33060, "root", "root");
+		Schema db = sess.getSchema("user_db");
+		Table table = db.getTable("users");
+
+		try {
+			table.update()
+				.set("diet_plan_id", convertToStd(diet))
+				.where("username like :username").bind("username", convertToStd(username))
+				.execute();
+		}
+		catch (const Error & err) {
+			cout << "ERROR: " << err << endl;
+			message.reply(status_codes::NotAcceptable); // May need to be modified to ensure for proper reply
+		}
+		message.reply(status_codes::OK);
+	}
+	
 }
 
 void NutritionalServer::handle_delete(http_request message) {
@@ -156,6 +181,17 @@ void NutritionalServer::handle_delete(http_request message) {
 
 std::string convertToStd(utility::string_t str) {
 	return utility::conversions::to_utf8string(str);
+}
+
+float calculateBMI(utility::string_t weight, utility::string_t height) {
+	return (703 * stof(convertToStd(weight))) / pow(stof(convertToStd(height)), 2);
+}
+
+int calculateUserDiet(float userBMI) {
+	float targetBMI = 19.2;
+	float diff = targetBMI - userBMI;
+
+
 }
 
 int nutritional_load() {
