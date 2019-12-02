@@ -1,17 +1,17 @@
 <div fxLayout="column" fxFill>
-    <form class="mat-elevation-z2 container" style="padding: 20px" fxLayout="column" fxFlex>
+    <form class="mat-elevation-z2 container" style="padding: 20px" fxLayout="column" fxFlex [formGroup]="survey" (ngSubmit)="submit()">
       <h1 class="mat-h1 no-margin no-padding" fxLayoutAlign="center center">{{title}}</h1>
       <mat-form-field *ngIf="!signInService.getIsLoggedIn()">
-        <input matInput placeholder="Email" type="email">
+        <input matInput placeholder="Email" type="email" formControlName="email">
       </mat-form-field>
       <mat-form-field>
-        <input matInput placeholder="Height (inches)" type="number">
+        <input matInput placeholder="Height (inches)" type="number" formControlName="height">
       </mat-form-field>
       <mat-form-field>
-        <input matInput placeholder="Weight (lbs)" type="number">
+        <input matInput placeholder="Weight (lbs)" type="number" formControlName="weight">
       </mat-form-field>
       <mat-form-field>
-        <mat-select placeholder="Gender">
+        <mat-select placeholder="Gender" formControlName="gender">
           <mat-option>None</mat-option>
           <mat-option value="Female">Female</mat-option>
           <mat-option value="Male">Male</mat-option>
@@ -19,20 +19,20 @@
         </mat-select>
       </mat-form-field>
       <mat-form-field>
-        <input matInput [matDatepicker]="picker" placeholder="Date of Birth" disabled="true">
-        <mat-datepicker-toggle matSuffix [for]="picker" disabled="false"></mat-datepicker-toggle>
-        <mat-datepicker #picker disabled="false"></mat-datepicker>
+        <input matInput [matDatepicker]="picker" placeholder="Date of Birth" formControlName="DOB">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
       <mat-form-field>
-        <mat-select placeholder="Dietary Restrictions">
-          <mat-option>None</mat-option>
+        <mat-select placeholder="Dietary Restrictions" formControlName="dietaryRestriction">
+          <mat-option value="None">None</mat-option>
           <mat-option value="Vegetarian">Vegetarian</mat-option>
           <mat-option value="Vegan">Vegan</mat-option>
           <mat-option value="Gluten-Free">Gluten-Free</mat-option>
         </mat-select>
       </mat-form-field>
       <mat-form-field>
-        <mat-select placeholder="Level of Activity">
+        <mat-select placeholder="Level of Activity" formControlName="lvlOfActivity">
           <mat-option>None</mat-option>
           <mat-option value="No Exercise">No exercise (0 hours a week)</mat-option>
           <mat-option value="Light Exercise">Light exercise (1-3 hours a week)</mat-option>
@@ -41,8 +41,8 @@
         </mat-select>
       </mat-form-field>
       <div fxLayout="row" fxLayoutAlign="space-between stretch" fxLayoutGap=".2em">
-        <button mat-raised-button color="primary" type="reset" fxFlex="50">Reset</button>
-        <button mat-raised-button (click)="submit()" color="primary" fxFlex="50">Submit</button>
+        <button mat-raised-button color="primary" type="reset" fxFlex="50" (click)="survey.reset()">Reset</button>
+        <button mat-raised-button [disabled]="survey.invalid" color="primary" fxFlex="50" type="submit">Submit</button>
       </div>
     </form>
 </div>

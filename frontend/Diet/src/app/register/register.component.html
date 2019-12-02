@@ -1,22 +1,22 @@
 <div class="mat-elevation-z2" style="padding: 3em" fxLayout="column" fxLayoutAlign="start stretch" fxFill>
   <h1 class="mat-h1" fxLayoutAlign="center center">Register</h1>
-    <form fxLayout="row" fxLayoutAlign="center center">
+    <form fxLayout="row" fxLayoutAlign="center center" [formGroup]="form" (ngSubmit)="register()">
       <div fxLayout="column" fxLayoutAlign="center stretch" fxFlex="50">
         <mat-form-field>
-          <input matInput placeholder="Name" type="text">
+          <input matInput placeholder="Name" type="text" formControlName="name">
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Email" type="email">
+          <input matInput placeholder="Email" type="email" formControlName="email">
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Password" type="password">
+          <input matInput placeholder="Password" type="password" formControlName="password">
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Confirm Password" type="password">
+          <input matInput placeholder="Confirm Password" type="password" formControlName="confirmPassword">
         </mat-form-field>
         <div fxLayout="row" fxLayoutAlign="space-between stretch" fxLayoutGap=".2em">
           <button mat-raised-button color="primary" type="reset" fxFlex="50">Reset</button>
-          <button mat-raised-button (click)="register()" color="primary" fxFlex="50">Register</button>
+          <button [disabled]="form.invalid" mat-raised-button color="primary" fxFlex="50" type="submit">Register</button>
         </div>
       </div>
     </form>

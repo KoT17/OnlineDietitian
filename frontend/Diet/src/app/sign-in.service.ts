@@ -5,6 +5,10 @@ import { Injectable } from '@angular/core';
 })
 export class SignInService {
   isLoggedIn: boolean = false;
+  user = {
+    email: '',
+    password: ''
+  };
 
   constructor() { }
 
@@ -14,5 +18,13 @@ export class SignInService {
 
   setIsLoggedIn(isLoggedIn: boolean): void {
     this.isLoggedIn = isLoggedIn;
+  }
+
+  setUser(user) {
+    this.user = user;
+  }
+
+  getUser() {
+    return this.user;
   }
 }

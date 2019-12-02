@@ -15,7 +15,6 @@ import { HomeComponent } from './home/home.component';
 import { ServicesComponent } from './services/services.component';
 import { ContactComponent } from './contact/contact.component';
 import { SignInComponent } from './sign-in/sign-in.component';
-import { ManageComponent } from './manage/manage.component';
 import { UserHomeComponent } from './user-home/user-home.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatCardModule } from '@angular/material/card';
@@ -44,7 +43,6 @@ import { HttpClientModule } from '@angular/common/http';
     ServicesComponent,
     ContactComponent,
     SignInComponent,
-    ManageComponent,
     UserHomeComponent,
     RegisterComponent,
     SurveyComponent,

@@ -4,7 +4,6 @@ import { HomeComponent } from './home/home.component';
 import { UserHomeComponent } from './user-home/user-home.component';
 import { ContactComponent } from './contact/contact.component';
 import { ServicesComponent } from './services/services.component';
-import { ManageComponent } from './manage/manage.component';
 import { SignInComponent } from './sign-in/sign-in.component';
 import { RegisterComponent } from './register/register.component';
 import { SurveyComponent } from './survey/survey.component';
