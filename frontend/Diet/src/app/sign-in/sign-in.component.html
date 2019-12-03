@@ -1,29 +1,17 @@
-<div fxLayout="column" fxLayoutAlign="center center" fxFill>
-  <mat-card class="example-card" fxLayout="column" fxLayoutAlign="center stretch">
-   <mat-card-header fxFlex>
-     <mat-card-title>Sign In</mat-card-title>
-   </mat-card-header>
-   <mat-card-content fxFlex>
-     <form class="example-form">
-       <table class="example-full-width" cellspacing="0">
-         <tr>
-           <td>
-             <mat-form-field class="example-full-width">
-             <input matInput placeholder="Username" [(ngModel)]="username" name="username" required>
-             </mat-form-field>
-           </td>
-         </tr>
-         <tr>
-         <td><mat-form-field class="example-full-width">
-           <input matInput placeholder="Password" [(ngModel)]="password"type="password" name="password" required>
-         </mat-form-field></td>
-       </tr></table>
-     </form>
-     <mat-spinner [style.display]="showSpinner ? 'block' : 'none'"></mat-spinner>
-   </mat-card-content>
-   <mat-card-actions fxLayout="row" fxLayoutAlign="space-between stretch" fxFlex>
+<div fxLayout="column" fxFill>
+  <form class="mat-elevation-z2 container" style="padding: 20px" fxLayout="column" fxFlex>
+    <h1 class="mat-h1 no-margin no-padding" fxLayoutAlign="center center">Sign In</h1>
+    <div fxLayout="column" fxLayoutAlign="start stretch">
+      <mat-form-field class="example-full-width">
+        <input matInput placeholder="Email" type="email" [(ngModel)]="username" name="username" required>
+      </mat-form-field>
+      <mat-form-field class="example-full-width">
+        <input matInput placeholder="Password" [(ngModel)]="password"type="password" name="password" required>
+      </mat-form-field>
+   </div>
+   <div fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="10px">
      <button mat-raised-button (click)="login()" color="primary" fxFlex="50">Sign In</button>
      <button mat-raised-button (click)="register()" color="primary" fxFlex="50">Register</button>
-   </mat-card-actions>
- </mat-card>
+   </div>
+ </form>
 </div>

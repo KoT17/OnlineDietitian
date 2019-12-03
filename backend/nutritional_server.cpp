@@ -240,7 +240,7 @@ void NutritionalServer::handle_post(http_request message) {
 				.set("height", convertToStd(height))
 				.set("gender", convertToStd(gender))
 				.set("age", currentYear - birthYear)
-				.set("BMI", calculateBMI(weight, height))
+				.set("BMI", (float) calculateBMI(weight, height))
 				.set("activity_level", convertToStd(activity))
 				.set("diet_restriction", convertToStd(restrict))
 				.where("username like :username").bind("username", convertToStd(username))
