@@ -36,6 +36,8 @@ NutritionalServer::NutritionalServer(utility::string_t url) : listener(url) {
 }
 
 void NutritionalServer::handle_get(http_request message) {
+
+	// Initilizing base header strings
 	ucout << message.to_string() << endl;
 	json::value food = json::value::object();
 	json::value jsonReturn;
@@ -60,25 +62,40 @@ void NutritionalServer::handle_get(http_request message) {
 		ucout << "GET User Info has been hit" << endl;
 	}
 
-	// Login information required for this block
+	// Server call to determine which diet the user can use
 	if (strcmp(utility::conversions::to_utf8string(source).c_str(), "diet_choice") == 0) {
 
+		// Establish connection to user and diet_plans table
 		Session sess("localhost", 33060, "root", "root");
 		Schema db = sess.getSchema("user_db");
 		Table table = db.getTable("users");
 		Table diets = db.getTable("diet_plans");
 
+		// Retrieve user data
 		Row userRow = table.select().where("username like :username AND password like :password").bind("username", convertToStd(username)).bind("password", convertToStd(password)).execute().fetchOne();
 
 		float userBMI;
 		int userRestrict;
 		std::string activityLevel;
 
-		// MODIFY THESE VALUES ONCE FINAL TABLE RELEASES
+		
+		userBMI = userRow.get(8);
+		userRestrict = userRow.get(10);
+		activityLevel = Value(userRow.get(11)).operator std::string();
+
+		list<int> dietRows = calculateUserDiet(diets, userBMI, userRestrict, activityLevel);
+
+		int	firstDietPlanID = dietRows.front();
+		int	secondDietPlanID = dietRows.back();
 		try {
-			userBMI = userRow.get(8);
-			userRestrict = userRow.get(10);
-			activityLevel = Value(userRow.get(11)).operator std::string();
+			Row firstDiet = diets.select().where("diet_plan_id like :dietID").bind("dietID", firstDietPlanID).execute().fetchOne();
+			Row secondDiet = diets.select().where("diet_plan_id like :dietID").bind("dietID", secondDietPlanID).execute().fetchOne();
+
+			res.set_body(jsonCreateFromDiet(firstDiet, secondDiet));
+			json::value response = res.extract_json(false).get();
+
+			cout << "Server succefully returned JSON of user diet options" << endl;
+			message.reply(status_codes::OK, response);
 		}
 		catch (const Error & err) {
 			cout << "ERROR: " << err << endl;
@@ -89,21 +106,7 @@ void NutritionalServer::handle_get(http_request message) {
 
 			message.reply(status_codes::NotAcceptable, errorJson);
 		}
-
-		list<int> dietRows = calculateUserDiet(diets, userBMI, userRestrict, activityLevel);
-
-		int	firstDietPlanID = dietRows.front();
-		int	secondDietPlanID = dietRows.back();
-
-		Row firstDiet = diets.select().where("diet_plan_id like :dietID").bind("dietID", firstDietPlanID).execute().fetchOne();
-		Row secondDiet = diets.select().where("diet_plan_id like :dietID").bind("dietID", secondDietPlanID).execute().fetchOne();
-
-		res.set_body(jsonCreateFromDiet(firstDiet, secondDiet));
-		json::value response = res.extract_json(false).get();
-
-		message.reply(status_codes::OK, response);
 	}
-	message.reply(status_codes::OK);
 }
 
 void NutritionalServer::handle_put(http_request message) {
@@ -112,6 +115,8 @@ void NutritionalServer::handle_put(http_request message) {
 }
 
 void NutritionalServer::handle_post(http_request message) {
+
+	// Initilizing base header strings
 	ucout << message.to_string() << endl;
 	utility::string_t sourceField = utility::conversions::to_string_t("source");
 	utility::string_t userField = utility::conversions::to_string_t("user");
@@ -125,10 +130,13 @@ void NutritionalServer::handle_post(http_request message) {
 	json::value error;
 	http_response res;
 
+	// POST for determing if user has proper creditinals 
 	if (strcmp(utility::conversions::to_utf8string(source).c_str(), "login") == 0) {
 		utility::string_t emailField = utility::conversions::to_string_t("email");
 
 		utility::string_t email = (message.headers().find(emailField))->second;
+
+		// Establish connection to DB
 		Session sess("localhost", 33060, "root", "root");
 		Schema db = sess.getSchema("user_db");
 		Table table = db.getTable("users");
@@ -154,7 +162,7 @@ void NutritionalServer::handle_post(http_request message) {
 
 			message.reply(status_codes::NotAcceptable, errorJson);
 		}
-	}
+	} // POST for registering new users 
 	else if (strcmp(utility::conversions::to_utf8string(source).c_str(), "registration") == 0) {
 		utility::string_t emailField = utility::conversions::to_string_t("email");
 		utility::string_t fNameField = utility::conversions::to_string_t("fName");
@@ -164,10 +172,13 @@ void NutritionalServer::handle_post(http_request message) {
 		utility::string_t fName = (message.headers().find(fNameField))->second;
 		utility::string_t lName = (message.headers().find(lNameField))->second;
 
+		// Establishing connection to users table
 		Session sess("localhost", 33060, "root", "root");
 		Schema db = sess.getSchema("user_db");
 		Table table = db.getTable("users");
 		int count = table.count();
+
+		// Error handle for username or email that already in use
 		try {
 			table.insert("username", "password", "first_name", "last_name", "email")
 				.values(convertToStd(username), convertToStd(password), convertToStd(fName), convertToStd(lName), convertToStd(email))
@@ -198,7 +209,7 @@ void NutritionalServer::handle_post(http_request message) {
 			message.reply(status_codes::OK, response);
 		}
 		else {
-			ucout << "Username or Email is not unique" << endl;
+			ucout << "Server did not add user" << endl;
 
 			error[L"error"] = json::value::string(utility::conversions::to_utf16string("Username or Email is not unique"));
 			res.set_body(error);
@@ -206,7 +217,7 @@ void NutritionalServer::handle_post(http_request message) {
 
 			message.reply(status_codes::NotAcceptable, errorJson);
 		}
-	}
+	} // POST for user filling out the survey 
 	else if (strcmp(utility::conversions::to_utf8string(source).c_str(), "survey") == 0) {
 		utility::string_t emailField = utility::conversions::to_string_t("email");
 		utility::string_t heightField = utility::conversions::to_string_t("height");
@@ -224,16 +235,19 @@ void NutritionalServer::handle_post(http_request message) {
 		utility::string_t activity = (message.headers().find(activityField))->second;
 		utility::string_t restrict = (message.headers().find(restrictField))->second;
 
+		// Calculate age 
 		int birthYear = stoi(convertToStd(DOB).substr(0, 4));
 		int birthMonth = stoi(convertToStd(DOB).substr(5, 6));
 		int birthDay = stoi(convertToStd(DOB).substr(8, 9));
 
 		int currentYear = stoi(convertToStd(datetime::utc_now().to_string()).substr(11, 15));
-
+		
+		// Establish connection to users table
 		Session sess("localhost", 33060, "root", "root");
 		Schema db = sess.getSchema("user_db");
 		Table table = db.getTable("users");
-
+		
+		// Update user information with new survey values
 		try {
 			table.update()
 				.set("weight", convertToStd(weight))
@@ -256,6 +270,7 @@ void NutritionalServer::handle_post(http_request message) {
 			message.reply(status_codes::BadGateway, errorJson);
 		}
 
+		// return JSON
 		jsonReturn[L"email"] = json::value::string(utility::conversions::to_utf16string(email));
 		jsonReturn[L"height"] = json::value::string(utility::conversions::to_utf16string(height));
 		jsonReturn[L"weight"] = json::value::string(utility::conversions::to_utf16string(weight));
@@ -271,7 +286,7 @@ void NutritionalServer::handle_post(http_request message) {
 		json::value response = res.extract_json(false).get();
 
 		message.reply(status_codes::OK, response);
-	}
+	} // POST for user picking their diet
 	else if (strcmp(utility::conversions::to_utf8string(source).c_str(), "selection") == 0) {
 		utility::string_t emailField = utility::conversions::to_string_t("email");
 		utility::string_t dietField = utility::conversions::to_string_t("diet");
@@ -279,12 +294,13 @@ void NutritionalServer::handle_post(http_request message) {
 		utility::string_t email = (message.headers().find(emailField))->second;
 		utility::string_t diet = (message.headers().find(dietField))->second;
 
+		// Establish connection to users table
 		Session sess("localhost", 33060, "root", "root");
 		Schema db = sess.getSchema("user_db");
 		Table table = db.getTable("users");
-
+		
+		// Send JSON as reply
 		try {
-
 			table.update()
 				.set("diet_plan_id", convertToStd(diet))
 				.where("username like :username").bind("username", convertToStd(username))
@@ -327,6 +343,7 @@ float calculateBMI(utility::string_t weight, utility::string_t height) {
 	return (703 * stof(convertToStd(weight))) / pow(stof(convertToStd(height)), 2);
 }
 
+// Creates response for GET diets 
 json::value jsonCreateFromDiet(Row firstDiet, Row secondDiet) {
 	json::value result;
 
@@ -347,6 +364,7 @@ json::value jsonCreateFromDiet(Row firstDiet, Row secondDiet) {
 	return result;
 }
 
+// Returns the diet_plan_id for two diets user specifications
 list<int> calculateUserDiet(Table table, float userBMI, int userRestrict, std::string activity) {
 	list<int> result;
 	float targetBMI = 19.2;
@@ -376,9 +394,6 @@ list<int> calculateUserDiet(Table table, float userBMI, int userRestrict, std::s
 	list<Row> values;
 	std::string whereStr = "";
 	std::string bindStr = "";
-	cout << values.size() << endl;
-
-	cout << "Passed Values" << endl;
 
 	switch (userRestrict) {
 	case 1: // Vegan Restriction
