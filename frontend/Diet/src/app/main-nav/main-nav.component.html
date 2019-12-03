@@ -1,39 +1,46 @@
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #drawer class="sidenav mat-elevation-z2" fixedInViewport
-      [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-      [mode]="(isHandset$ | async) ? 'over' : 'side'"
-      [opened]="(isHandset$ | async) === false">
-    <mat-toolbar color="primary"><mat-icon>menu</mat-icon><div fxFlex="0 0 10px"></div>Menu</mat-toolbar>
-    <mat-nav-list *ngIf="signInService.getIsLoggedIn()">
-      <a mat-list-item routerLink="/authhome"><mat-icon>home</mat-icon><div fxFlex="0 0 10px"></div>Home</a>
-      <a mat-list-item routerLink="/services"><mat-icon>scatter_plot</mat-icon><div fxFlex="0 0 10px"></div>Services</a>
-      <a mat-list-item routerLink="/manage"><mat-icon>build</mat-icon><div fxFlex="0 0 10px"></div>Manage</a>
-      <a mat-list-item routerLink="/contactUs"><mat-icon>contact_support</mat-icon><div fxFlex="0 0 10px"></div>Contact Us</a>
-      <a mat-list-item routerLink="/home" (click)="signInService.setIsLoggedIn(false)"><mat-icon>account_circle</mat-icon><div fxFlex="0 0 10px"></div>Sign out</a>
-    </mat-nav-list>
-    <mat-nav-list *ngIf="!signInService.getIsLoggedIn()">
-      <a mat-list-item routerLink="/home"><mat-icon>home</mat-icon><div fxFlex="0 0 10px"></div>Home</a>
-      <a mat-list-item routerLink="/services"><mat-icon>scatter_plot</mat-icon><div fxFlex="0 0 10px"></div>Services</a>
-      <a mat-list-item routerLink="/contactUs"><mat-icon>contact_support</mat-icon><div fxFlex="0 0 10px"></div>Contact Us</a>
-      <a mat-list-item routerLink="/signIn"><mat-icon>account_circle</mat-icon><div fxFlex="0 0 10px"></div>Sign in</a>
-    </mat-nav-list>
-  </mat-sidenav>
-  <mat-sidenav-content>
-    <div class="sidenav-content-div" fxLayout="column">
-      <mat-toolbar color="primary"fxLayoutAlign="center center">
-        <button
-          type="button"
-          aria-label="Toggle sidenav"
-          mat-icon-button
-          (click)="drawer.toggle()"
-          *ngIf="isHandset$ | async">
-          <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
-        </button>
-        <span>Online Dietitian</span>
-      </mat-toolbar>
-      <div class="contentScroll" fxFlex fxLayout="column">
-        <ng-content></ng-content>
-      </div>
+  [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+  [mode]="(isHandset$ | async) ? 'over' : 'side'"
+  [opened]="(isHandset$ | async) === false">
+  <mat-toolbar color="primary"><mat-icon>menu</mat-icon><div fxFlex="0 0 10px"></div>Menu</mat-toolbar>
+  <mat-nav-list *ngIf="signInService.getIsLoggedIn()" style="padding-top: 0px">
+    <a mat-list-item routerLink="/authhome"><mat-icon>home</mat-icon><div fxFlex="0 0 10px"></div>Home</a>
+    <a mat-list-item routerLink="/services"><mat-icon>scatter_plot</mat-icon><div fxFlex="0 0 10px"></div>Services</a>
+    <a mat-list-item routerLink="/manage"><mat-icon>build</mat-icon><div fxFlex="0 0 10px"></div>Manage</a>
+    <a mat-list-item routerLink="/contactUs"><mat-icon>contact_support</mat-icon><div fxFlex="0 0 10px"></div>Contact Us</a>
+    <a mat-list-item routerLink="/home" (click)="signInService.setIsLoggedIn(false)"><mat-icon>account_circle</mat-icon><div fxFlex="0 0 10px"></div>Sign Out</a>
+  </mat-nav-list>
+  <mat-nav-list *ngIf="!signInService.getIsLoggedIn()" style="padding-top: 0px">
+    <a mat-list-item routerLink="/home"><mat-icon>home</mat-icon><div fxFlex="0 0 10px"></div>Home</a>
+    <a mat-list-item routerLink="/services"><mat-icon>scatter_plot</mat-icon><div fxFlex="0 0 10px"></div>Services</a>
+    <a mat-list-item routerLink="/contactUs"><mat-icon>contact_support</mat-icon><div fxFlex="0 0 10px"></div>Contact Us</a>
+    <a mat-list-item routerLink="/signIn"><mat-icon>account_circle</mat-icon><div fxFlex="0 0 10px"></div>Sign In</a>
+  </mat-nav-list>
+</mat-sidenav>
+<mat-sidenav-content>
+  <div class="sidenav-content-div" fxLayout="column">
+    <mat-toolbar color="primary"fxLayoutAlign="space-between center">
+      <button
+      type="button"
+      aria-label="Toggle sidenav"
+      mat-icon-button
+      (click)="drawer.toggle()"
+      *ngIf="isHandset$ | async"
+      fxFlex="0 0 10px">
+      <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+    </button>
+    <div fxFlex></div>
+    <div fxLayout="row" fxLayoutAlign="start center">
+      <mat-icon>restaurant</mat-icon>
+      <div fxFlex="0 0 10px"></div>
+      <span>Online Dietitian</span>
     </div>
-  </mat-sidenav-content>
+    <div fxFlex></div>
+  </mat-toolbar>
+  <div class="contentScroll" fxFlex fxLayout="column">
+    <ng-content></ng-content>
+  </div>
+</div>
+</mat-sidenav-content>
 </mat-sidenav-container>
