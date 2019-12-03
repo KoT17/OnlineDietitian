@@ -80,7 +80,7 @@ void NutritionalServer::handle_post(http_request message) {
 	json::value jsonReturn;
 	json::value error;
 	http_response res;
-	http_client client(L"http://localhost:4200/NutritionalLookup");
+	http_client client(L"http://localhost:4201/NutritionalLookup");
 
 	if (strcmp(utility::conversions::to_utf8string(source).c_str(), "login") == 0) {
 		utility::string_t emailField = utility::conversions::to_string_t("email");
@@ -190,14 +190,14 @@ void NutritionalServer::handle_post(http_request message) {
 		Session sess("localhost", 33060, "root", "root");
 		Schema db = sess.getSchema("user_db");
 		Table table = db.getTable("users");
-
+		cout << calculateBMI(weight, height);
 		try {
 			table.update()
 				.set("weight", convertToStd(weight))
 				.set("height", convertToStd(height))
 				.set("gender", convertToStd(gender))
 				.set("age", currentYear - birthYear)
-				.set("BMI", calculateBMI(weight, height))
+				.set("BMI", (float) calculateBMI(weight, height))
 				.set("activity_level", convertToStd(activity))
 				.set("diet_restriction", convertToStd(restrict))
 				.where("username like :username").bind("username", convertToStd(username))

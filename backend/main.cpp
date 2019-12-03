@@ -49,7 +49,7 @@ void on_shutdown()
 
 int wmain(int argc, wchar_t* argv[])
 {
-	utility::string_t port = U("4200");
+	utility::string_t port = U("4201");
 	if (argc == 2)
 	{
 		port = argv[1];
