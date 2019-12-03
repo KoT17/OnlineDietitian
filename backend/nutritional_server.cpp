@@ -25,6 +25,8 @@ using namespace http::experimental::listener;
 
 std::string convertToStd(utility::string_t str);
 float calculateBMI(utility::string_t weight, utility::string_t height);
+list<int> calculateUserDiet(Table table, float userBMI, int userRestrict, std::string activity);
+json::value jsonCreateFromDiet(Row firstDiet, Row secondDiet);
 
 NutritionalServer::NutritionalServer(utility::string_t url) : listener(url) {
 	listener.support(methods::GET, std::bind(&NutritionalServer::handle_get, this, std::placeholders::_1));
@@ -36,6 +38,9 @@ NutritionalServer::NutritionalServer(utility::string_t url) : listener(url) {
 void NutritionalServer::handle_get(http_request message) {
 	ucout << message.to_string() << endl;
 	json::value food = json::value::object();
+	json::value jsonReturn;
+	json::value error;
+	http_response res;
 
 	utility::string_t sourceField = utility::conversions::to_string_t("source");
 	utility::string_t userField = utility::conversions::to_string_t("user");
@@ -57,7 +62,46 @@ void NutritionalServer::handle_get(http_request message) {
 
 	// Login information required for this block
 	if (strcmp(utility::conversions::to_utf8string(source).c_str(), "diet_choice") == 0) {
-		ucout << "GET Diet Choices has been hit" << endl;
+
+		Session sess("localhost", 33060, "root", "root");
+		Schema db = sess.getSchema("user_db");
+		Table table = db.getTable("users");
+		Table diets = db.getTable("diet_plans");
+
+		Row userRow = table.select().where("username like :username AND password like :password").bind("username", convertToStd(username)).bind("password", convertToStd(password)).execute().fetchOne();
+
+		float userBMI;
+		int userRestrict;
+		std::string activityLevel;
+
+		// MODIFY THESE VALUES ONCE FINAL TABLE RELEASES
+		try {
+			userBMI = userRow.get(8);
+			userRestrict = userRow.get(10);
+			activityLevel = Value(userRow.get(11)).operator std::string();
+		}
+		catch (const Error & err) {
+			cout << "ERROR: " << err << endl;
+
+			error[L"error"] = json::value::string(utility::conversions::to_utf16string("Username or Email is not unique"));
+			res.set_body(error);
+			json::value errorJson = res.extract_json(false).get();
+
+			message.reply(status_codes::NotAcceptable, errorJson);
+		}
+
+		list<int> dietRows = calculateUserDiet(diets, userBMI, userRestrict, activityLevel);
+
+		int	firstDietPlanID = dietRows.front();
+		int	secondDietPlanID = dietRows.back();
+
+		Row firstDiet = diets.select().where("diet_plan_id like :dietID").bind("dietID", firstDietPlanID).execute().fetchOne();
+		Row secondDiet = diets.select().where("diet_plan_id like :dietID").bind("dietID", secondDietPlanID).execute().fetchOne();
+
+		res.set_body(jsonCreateFromDiet(firstDiet, secondDiet));
+		json::value response = res.extract_json(false).get();
+
+		message.reply(status_codes::OK, response);
 	}
 	message.reply(status_codes::OK);
 }
@@ -80,7 +124,6 @@ void NutritionalServer::handle_post(http_request message) {
 	json::value jsonReturn;
 	json::value error;
 	http_response res;
-	http_client client(L"http://localhost:4200/NutritionalLookup");
 
 	if (strcmp(utility::conversions::to_utf8string(source).c_str(), "login") == 0) {
 		utility::string_t emailField = utility::conversions::to_string_t("email");
@@ -284,11 +327,93 @@ float calculateBMI(utility::string_t weight, utility::string_t height) {
 	return (703 * stof(convertToStd(weight))) / pow(stof(convertToStd(height)), 2);
 }
 
-int calculateUserDiet(float userBMI) {
+json::value jsonCreateFromDiet(Row firstDiet, Row secondDiet) {
+	json::value result;
+
+	result[L"firstDiet"][L"DietName"] = json::value::number(firstDiet.get(0).operator int());
+	result[L"firstDiet"][L"calorie_count"] = json::value::number(firstDiet.get(1).operator int());
+	result[L"firstDiet"][L"dietary_restrictions"] = json::value::string(utility::conversions::to_utf16string(firstDiet.get(2).operator std::string().c_str()));
+	result[L"firstDiet"][L"breakfast"] = json::value::string(utility::conversions::to_utf16string(firstDiet.get(3).operator std::string().c_str()));
+	result[L"firstDiet"][L"lunch"] = json::value::string(utility::conversions::to_utf16string(firstDiet.get(4).operator std::string().c_str()));
+	result[L"firstDiet"][L"dinner"] = json::value::string(utility::conversions::to_utf16string(firstDiet.get(5).operator std::string().c_str()));
+
+	result[L"secondDiet"][L"DietName"] = json::value::number(secondDiet.get(0).operator int());
+	result[L"secondDiet"][L"calorie_count"] = json::value::number(secondDiet.get(1).operator int());
+	result[L"secondDiet"][L"dietary_restrictions"] = json::value::string(utility::conversions::to_utf16string(secondDiet.get(2).operator std::string().c_str()));
+	result[L"secondDiet"][L"breakfast"] = json::value::string(utility::conversions::to_utf16string(secondDiet.get(3).operator std::string().c_str()));
+	result[L"secondDiet"][L"lunch"] = json::value::string(utility::conversions::to_utf16string(secondDiet.get(4).operator std::string().c_str()));
+	result[L"secondDiet"][L"dinner"] = json::value::string(utility::conversions::to_utf16string(secondDiet.get(5).operator std::string().c_str()));
+
+	return result;
+}
+
+list<int> calculateUserDiet(Table table, float userBMI, int userRestrict, std::string activity) {
+	list<int> result;
 	float targetBMI = 19.2;
 	float diff = targetBMI - userBMI;
+	int calorieCeiling;
 
+	// Determine proper calorie count from BMI
+	if (diff > 10.8)
+		calorieCeiling = 1201;
+	else if (diff > 5.8)
+		calorieCeiling = 1501;
+	else if (diff > 0)
+		calorieCeiling = 2201;
+	else
+		calorieCeiling = 2701;
+		
+	// Factor excerise 
+	if (strcmp(activity.c_str(), "Light Excersie") == 0)
+		calorieCeiling += 200;
+	else if (strcmp(activity.c_str(),"Moderate Excersie") == 0)
+		calorieCeiling += 400;
+	else if (strcmp(activity.c_str(), "Heavy Excerise") == 0) {
+		calorieCeiling += 600;
+	}
 
+	// Create the results from the table to send to the client
+	list<Row> values;
+	std::string whereStr = "";
+	std::string bindStr = "";
+	cout << values.size() << endl;
+
+	cout << "Passed Values" << endl;
+
+	switch (userRestrict) {
+	case 1: // Vegan Restriction
+		whereStr = "dietary_restrictions like :restrict AND calorie_count < :calorie";
+		bindStr = "Vegan";
+		break;
+	case 2: // Vegetratian Restriction
+		whereStr = "dietary_restrictions like :restrict AND calorie_count < :calorie";
+		bindStr = "Vegetarian";
+		break;
+	case 3: // GF Restriction
+		whereStr = "dietary_restrictions like :restrict AND calorie_count < :calorie";
+		bindStr = "GF";
+		break;
+	}
+
+	if(userRestrict == 0)
+		values = table.select().execute().fetchAll();
+	else {
+		values = table.select().where(whereStr).bind("restrict", bindStr).bind("calorie", calorieCeiling).execute().fetchAll();
+	}
+
+	int dietOneSpot = rand() % values.size();
+	int dietTwoSpot = rand()/2 % values.size();
+	int count = 0;
+	while (dietTwoSpot == dietOneSpot && (values.size() != 1)) {
+		dietTwoSpot = (dietTwoSpot+1) % values.size();
+	}
+
+	for (list<Row>::iterator it = values.begin(); it != values.end(); it++) {
+		if(count == dietOneSpot || count == dietTwoSpot)
+			result.push_back(it->get(0).operator int());
+		count++;
+	}
+	return result;
 }
 
 int nutritional_load() {
