@@ -24,8 +24,8 @@ export class PickdietComponent implements OnInit {
     })}).pipe(take(1)).pipe(catchError(this.handleError)).subscribe(res => {
       console.log(res)
       this.options = res;
-      //this.options.firstDiet.dietary_restrictions = this.convertDiet(this.options.firstDiet.dietary_restrictions)
-      //this.options.secondDiet.dietary_restrictions = this.convertDiet(this.options.secondDiet.dietary_restrictions)
+      this.options.firstDiet.dietary_restrictions = this.convertDiet(this.options.firstDiet.dietary_restrictions)
+      this.options.secondDiet.dietary_restrictions = this.convertDiet(this.options.secondDiet.dietary_restrictions)
     });
   }
 
