@@ -24,6 +24,8 @@ export class PickdietComponent implements OnInit {
     })}).pipe(take(1)).pipe(catchError(this.handleError)).subscribe(res => {
       console.log(res)
       this.options = res;
+      //this.options.firstDiet.dietary_restrictions = this.convertDiet(this.options.firstDiet.dietary_restrictions)
+      //this.options.secondDiet.dietary_restrictions = this.convertDiet(this.options.secondDiet.dietary_restrictions)
     });
   }
 
@@ -58,5 +60,26 @@ export class PickdietComponent implements OnInit {
    handleErrorPost(error: HttpErrorResponse) {
      alert("Couldn't post diet selection!");
      return throwError('');
+   }
+
+   convertDiet(diet): string {
+     let number: string;
+     switch(diet) {
+       case 0:
+         number = "None";
+         break;
+       case 1:
+         number = "Vegan";
+         break;
+       case 2:
+         number = "Vegetarian";
+         break;
+       case 3:
+         number = "Gluten Free";
+         break;
+       default:
+         break;
+     }
+     return number;
    }
 }

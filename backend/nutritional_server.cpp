@@ -454,14 +454,14 @@ json::value jsonCreateFromDiet(Row firstDiet, Row secondDiet) {
 
 	result[L"firstDiet"][L"DietName"] = json::value::number(firstDiet.get(0).operator int());
 	result[L"firstDiet"][L"calorie_count"] = json::value::number(firstDiet.get(1).operator int());
-	result[L"firstDiet"][L"dietary_restrictions"] = json::value::string(utility::conversions::to_utf16string(firstDiet.get(2).operator std::string().c_str()));
+	result[L"firstDiet"][L"dietary_restrictions"] = json::value::number(firstDiet.get(2).operator int());
 	result[L"firstDiet"][L"breakfast"] = json::value::string(utility::conversions::to_utf16string(firstDiet.get(3).operator std::string().c_str()));
 	result[L"firstDiet"][L"lunch"] = json::value::string(utility::conversions::to_utf16string(firstDiet.get(4).operator std::string().c_str()));
 	result[L"firstDiet"][L"dinner"] = json::value::string(utility::conversions::to_utf16string(firstDiet.get(5).operator std::string().c_str()));
 
 	result[L"secondDiet"][L"DietName"] = json::value::number(secondDiet.get(0).operator int());
 	result[L"secondDiet"][L"calorie_count"] = json::value::number(secondDiet.get(1).operator int());
-	result[L"secondDiet"][L"dietary_restrictions"] = json::value::string(utility::conversions::to_utf16string(secondDiet.get(2).operator std::string().c_str()));
+	result[L"secondDiet"][L"dietary_restrictions"] = json::value::number(secondDiet.get(2).operator int());
 	result[L"secondDiet"][L"breakfast"] = json::value::string(utility::conversions::to_utf16string(secondDiet.get(3).operator std::string().c_str()));
 	result[L"secondDiet"][L"lunch"] = json::value::string(utility::conversions::to_utf16string(secondDiet.get(4).operator std::string().c_str()));
 	result[L"secondDiet"][L"dinner"] = json::value::string(utility::conversions::to_utf16string(secondDiet.get(5).operator std::string().c_str()));
