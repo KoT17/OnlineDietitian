@@ -212,6 +212,98 @@ void NutritionalServer::handle_get(http_request message) {
 			message.reply(status_codes::NotAcceptable, errorJson);
 		}
 	}
+	if (strcmp(utility::conversions::to_utf8string(source).c_str(), "home_page") == 0) {
+
+		// Establish connection to user and diet_plans table
+		Session sess("localhost", 33060, "root", "root");
+		Schema db = sess.getSchema("user_db");
+		Table table = db.getTable("users");
+		Table diets = db.getTable("diet_plans");
+
+		Row userRow = table.select().where("username like :username AND password like :password").bind("username", convertToStd(username)).bind("password", convertToStd(password)).execute().fetchOne();
+
+		int userRestrict = userRow.get(10);
+
+		list<Row> values = table.select().execute().fetchAll();
+
+		json::value response;
+		int i = 1;
+
+		ucout << "TRIGGERED" << endl;
+
+		// 0 is none
+		if (userRestrict == 0) {
+
+			for (list<Row>::iterator it = values.begin(); it != values.end(); it++) {
+
+				jsonReturn[to_wstring(i)][L"diet_plan_id"] = json::value::number(it->get(0).operator int());
+				jsonReturn[to_wstring(i)][L"calorie_count"] = json::value::number(it->get(1).operator int());
+				jsonReturn[to_wstring(i)][L"dietary_restrictions"] = json::value::number(it->get(2).operator int());
+				jsonReturn[to_wstring(i)][L"breakfast"] = json::value::string(utility::conversions::to_utf16string(it->get(3).operator std::string().c_str()));
+				jsonReturn[to_wstring(i)][L"lunch"] = json::value::string(utility::conversions::to_utf16string(it->get(4).operator std::string().c_str()));
+				jsonReturn[to_wstring(i)][L"dinner"] = json::value::string(utility::conversions::to_utf16string(it->get(5).operator std::string().c_str()));
+
+				res.set_body(jsonReturn);
+
+				response = res.extract_json(false).get();
+				i++;
+			}
+		}
+		else {
+			// 1 is vegan
+			if (userRestrict == 1) {
+				Row dietRow = diets.select().where("dietary_restrictions = 1").execute().fetchOne();
+				for (int i = 0; i < 7; i++) {
+					jsonReturn[to_wstring(i)][L"diet_plan_id"] = json::value::number(dietRow.get(0).operator int());
+					jsonReturn[to_wstring(i)][L"calorie_count"] = json::value::number(dietRow.get(1).operator int());
+					jsonReturn[to_wstring(i)][L"dietary_restrictions"] = json::value::number(dietRow.get(2).operator int());
+					jsonReturn[to_wstring(i)][L"breakfast"] = json::value::string(utility::conversions::to_utf16string(dietRow.get(3).operator std::string().c_str()));
+					jsonReturn[to_wstring(i)][L"lunch"] = json::value::string(utility::conversions::to_utf16string(dietRow.get(4).operator std::string().c_str()));
+					jsonReturn[to_wstring(i)][L"dinner"] = json::value::string(utility::conversions::to_utf16string(dietRow.get(5).operator std::string().c_str()));
+
+					res.set_body(jsonReturn);
+
+					response = res.extract_json(false).get();
+				}
+			}
+			// 2 is vegetarian
+			if (userRestrict == 2) {
+				Row dietRow = diets.select().where("dietary_restrictions = 2").execute().fetchOne();
+				for (int i = 0; i < 7; i++) {
+					jsonReturn[to_wstring(i)][L"diet_plan_id"] = json::value::number(dietRow.get(0).operator int());
+					jsonReturn[to_wstring(i)][L"calorie_count"] = json::value::number(dietRow.get(1).operator int());
+					jsonReturn[to_wstring(i)][L"dietary_restrictions"] = json::value::number(dietRow.get(2).operator int());
+					jsonReturn[to_wstring(i)][L"breakfast"] = json::value::string(utility::conversions::to_utf16string(dietRow.get(3).operator std::string().c_str()));
+					jsonReturn[to_wstring(i)][L"lunch"] = json::value::string(utility::conversions::to_utf16string(dietRow.get(4).operator std::string().c_str()));
+					jsonReturn[to_wstring(i)][L"dinner"] = json::value::string(utility::conversions::to_utf16string(dietRow.get(5).operator std::string().c_str()));
+
+					res.set_body(jsonReturn);
+
+					response = res.extract_json(false).get();
+				}
+			}
+			// 3 is GF
+			if (userRestrict == 3) {
+				Row dietRow = diets.select().where("dietary_restrictions = 3").execute().fetchOne();
+				for (int i = 0; i < 7; i++) {
+					jsonReturn[to_wstring(i)][L"diet_plan_id"] = json::value::number(dietRow.get(0).operator int());
+					jsonReturn[to_wstring(i)][L"calorie_count"] = json::value::number(dietRow.get(1).operator int());
+					jsonReturn[to_wstring(i)][L"dietary_restrictions"] = json::value::number(dietRow.get(2).operator int());
+					jsonReturn[to_wstring(i)][L"breakfast"] = json::value::string(utility::conversions::to_utf16string(dietRow.get(3).operator std::string().c_str()));
+					jsonReturn[to_wstring(i)][L"lunch"] = json::value::string(utility::conversions::to_utf16string(dietRow.get(4).operator std::string().c_str()));
+					jsonReturn[to_wstring(i)][L"dinner"] = json::value::string(utility::conversions::to_utf16string(dietRow.get(5).operator std::string().c_str()));
+
+					res.set_body(jsonReturn);
+
+					response = res.extract_json(false).get();
+				}
+			}
+		}
+
+		ucout << "Server succefully returned JSON of diet plan results" << endl;
+
+		message.reply(status_codes::OK, response);
+	}
 }
 
 void NutritionalServer::handle_put(http_request message) {
@@ -454,14 +546,18 @@ json::value jsonCreateFromDiet(Row firstDiet, Row secondDiet) {
 
 	result[L"firstDiet"][L"DietName"] = json::value::number(firstDiet.get(0).operator int());
 	result[L"firstDiet"][L"calorie_count"] = json::value::number(firstDiet.get(1).operator int());
-	result[L"firstDiet"][L"dietary_restrictions"] = json::value::string(utility::conversions::to_utf16string(firstDiet.get(2).operator std::string().c_str()));
+<<<<<<< HEAD
+	result[L"firstDiet"][L"dietary_restrictions"] = json::value::number(firstDiet.get(3).operator int());
+=======
+	result[L"firstDiet"][L"dietary_restrictions"] = json::value::number(firstDiet.get(2).operator int());
+>>>>>>> b0a395de466cfdb71dca0761debe1b9182c76bd5
 	result[L"firstDiet"][L"breakfast"] = json::value::string(utility::conversions::to_utf16string(firstDiet.get(3).operator std::string().c_str()));
 	result[L"firstDiet"][L"lunch"] = json::value::string(utility::conversions::to_utf16string(firstDiet.get(4).operator std::string().c_str()));
 	result[L"firstDiet"][L"dinner"] = json::value::string(utility::conversions::to_utf16string(firstDiet.get(5).operator std::string().c_str()));
 
 	result[L"secondDiet"][L"DietName"] = json::value::number(secondDiet.get(0).operator int());
 	result[L"secondDiet"][L"calorie_count"] = json::value::number(secondDiet.get(1).operator int());
-	result[L"secondDiet"][L"dietary_restrictions"] = json::value::string(utility::conversions::to_utf16string(secondDiet.get(2).operator std::string().c_str()));
+	result[L"secondDiet"][L"dietary_restrictions"] = json::value::number(secondDiet.get(2).operator int());
 	result[L"secondDiet"][L"breakfast"] = json::value::string(utility::conversions::to_utf16string(secondDiet.get(3).operator std::string().c_str()));
 	result[L"secondDiet"][L"lunch"] = json::value::string(utility::conversions::to_utf16string(secondDiet.get(4).operator std::string().c_str()));
 	result[L"secondDiet"][L"dinner"] = json::value::string(utility::conversions::to_utf16string(secondDiet.get(5).operator std::string().c_str()));
@@ -534,46 +630,4 @@ list<int> calculateUserDiet(Table table, float userBMI, int userRestrict, std::s
 		count++;
 	}
 	return result;
-}
-
-int nutritional_load() {
-
-	try {
-		Session sess("localhost", 33060, "root", "root");
-		Schema db = sess.getSchema("OnlineDietitian");
-
-
-		// Create a new collection 'my_collection'
-		Table table = db.getTable("Food");
-
-		cout << distance(db.getTables().begin(), db.getTables().end()) << endl;
-
-		cout << "Connected to food DB" << endl;
-
-		list<Row> values = table.select().execute().fetchAll();
-
-		cout << "ID\tNAME\t\tCALORIES\tFAT\tCARBS\tPROTEIN\tSERVING SIZE" << endl;
-
-		for (list<Row>::iterator it = values.begin(); it != values.end(); it++) {
-			cout << it->get(0) << "\t" // id 
-				<< it->get(1) << "\t\t" // name
-				<< it->get(2) << "\t" // calories
-				<< it->get(3) << "\t" // fat
-				<< it->get(4) << "\t" // carbs 
-				<< it->get(5) << "\t" // protein
-				<< it->get(6) << endl; // serving size
-		}
-	}
-	catch (const Error & err)
-	{
-		cout << "ERROR: " << err << endl;
-	}
-	catch (std::exception & ex)
-	{
-		cout << "STD EXCEPTION: " << ex.what() << endl;
-	}
-	catch (const char* ex)
-	{
-		cout << "EXCEPTION: " << ex << endl;
-	}
 }
