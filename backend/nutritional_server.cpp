@@ -57,8 +57,11 @@ void NutritionalServer::handle_get(http_request message) {
 	if (strcmp(utility::conversions::to_utf8string(source).c_str(), "lookup") == 0) {
 
 		// Get the query string, format it into just the value
-		const utility::string_t fullQueryString = message.request_uri().query();
-		const utility::string_t search = fullQueryString.substr(convertToStd(fullQueryString).find("search=") + 7);
+		utility::string_t fullQueryString = message.request_uri().query();
+		utility::string_t search = fullQueryString.substr(convertToStd(fullQueryString).find("search=") + 7);
+
+		// Add the regular expression syntax for "contains" to the string.
+		search = utility::conversions::to_string_t("%") + search + utility::conversions::to_string_t("%");
 
 		// Open a database connection for the nutritional_values table
 		Session sess("localhost", 33060, "root", "root");
@@ -72,72 +75,29 @@ void NutritionalServer::handle_get(http_request message) {
 
 			list<Row> values = table.select().where("food_name like :search").bind("search", search).execute().fetchAll();
 
+			json::value response;
+			int i = 1;
 			for (list<Row>::iterator it = values.begin(); it != values.end(); it++) {
 
-				std::stringstream buffer;
-				std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-				std::cout << it->get(0);
-				std::string text = buffer.str();
-
-				jsonReturn[L"food_name"] = json::value::string(utility::conversions::to_utf16string(text));
-
-				std::stringstream buffer2;
-				old = std::cout.rdbuf(buffer2.rdbuf());
-				cout << it->get(1);
-				text = buffer2.str();
-				jsonReturn[L"calories"] = json::value::string(utility::conversions::to_utf16string(text));
-
-				std::stringstream buffer3;
-				old = std::cout.rdbuf(buffer3.rdbuf());
-				cout << it->get(2);
-				text = buffer3.str();
-				jsonReturn[L"serving_size"] = json::value::string(utility::conversions::to_utf16string(text));
-
-				std::stringstream buffer4;
-				old = std::cout.rdbuf(buffer4.rdbuf());
-				cout << it->get(3);
-				text = buffer4.str();
-				jsonReturn[L"total_fat"] = json::value::string(utility::conversions::to_utf16string(text));
-
-				std::stringstream buffer5;
-				old = std::cout.rdbuf(buffer5.rdbuf());
-				cout << it->get(4);
-				text = buffer5.str();
-				jsonReturn[L"cholesterol"] = json::value::string(utility::conversions::to_utf16string(text));
-
-				std::stringstream buffer6;
-				old = std::cout.rdbuf(buffer6.rdbuf());
-				cout << it->get(5);
-				text = buffer6.str();
-				jsonReturn[L"sodium"] = json::value::string(utility::conversions::to_utf16string(text));
-
-				std::stringstream buffer7;
-				old = std::cout.rdbuf(buffer7.rdbuf());
-				cout << it->get(6);
-				text = buffer7.str();
-				jsonReturn[L"carbohydrates"] = json::value::string(utility::conversions::to_utf16string(text));
-
-				std::stringstream buffer8;
-				old = std::cout.rdbuf(buffer8.rdbuf());
-				cout << it->get(7);
-				text = buffer8.str();
-				jsonReturn[L"sugars"] = json::value::string(utility::conversions::to_utf16string(text));
-
-				std::stringstream buffer9;
-				old = std::cout.rdbuf(buffer9.rdbuf());
-				cout << it->get(8);
-				text = buffer9.str();
-				jsonReturn[L"protein"] = json::value::string(utility::conversions::to_utf16string(text));
+				jsonReturn[to_wstring(i)][L"food_name"] = json::value::string(utility::conversions::to_utf16string(it->get(0).operator std::string().c_str()));
+				jsonReturn[to_wstring(i)][L"calories"] = json::value::string(utility::conversions::to_utf16string(it->get(1).operator std::string().c_str()));
+				jsonReturn[to_wstring(i)][L"serving_size"] = json::value::string(utility::conversions::to_utf16string(it->get(2).operator std::string().c_str()));
+				jsonReturn[to_wstring(i)][L"total_fat"] = json::value::string(utility::conversions::to_utf16string(it->get(3).operator std::string().c_str()));
+				jsonReturn[to_wstring(i)][L"cholesterol"] = json::value::string(utility::conversions::to_utf16string(it->get(4).operator std::string().c_str()));
+				jsonReturn[to_wstring(i)][L"sodium"] = json::value::string(utility::conversions::to_utf16string(it->get(5).operator std::string().c_str()));
+				jsonReturn[to_wstring(i)][L"carbohydrates"] = json::value::string(utility::conversions::to_utf16string(it->get(6).operator std::string().c_str()));
+				jsonReturn[to_wstring(i)][L"sugars"] = json::value::string(utility::conversions::to_utf16string(it->get(7).operator std::string().c_str()));
+				jsonReturn[to_wstring(i)][L"protein"] = json::value::string(utility::conversions::to_utf16string(it->get(8).operator std::string().c_str()));
 
 				res.set_body(jsonReturn);
 
-				json::value response = res.extract_json(false).get();
-
-				ucout << "Server succefully returned JSON of search results" << endl;
-
-				message.reply(status_codes::OK, response);
+				response = res.extract_json(false).get();
+				i++;
 			}
-			message.reply(status_codes::NotFound);
+
+			ucout << "Server succefully returned JSON of search results" << endl;
+
+			message.reply(status_codes::OK, response);
 		}
 		catch (const Error & err)
 		{
@@ -170,84 +130,28 @@ void NutritionalServer::handle_get(http_request message) {
 
 			list<Row> values = table.select().where("username like :username AND password like :password").bind("username", convertToStd(username)).bind("password", convertToStd(password)).execute().fetchAll();
 
+			json::value response;
+
 			for (list<Row>::iterator it = values.begin(); it != values.end(); it++) {
 
-				std::stringstream buffer;
-				std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-				std::cout << it->get(3);
-				std::string text = buffer.str();
-
-				jsonReturn[L"first_name"] = json::value::string(utility::conversions::to_utf16string(text));
-
-				std::stringstream buffer2;
-				old = std::cout.rdbuf(buffer2.rdbuf());
-				cout << it->get(4);
-				text = buffer2.str();
-				jsonReturn[L"last_name"] = json::value::string(utility::conversions::to_utf16string(text));
-
-				std::stringstream buffer3;
-				old = std::cout.rdbuf(buffer3.rdbuf());
-				cout << it->get(5);
-				text = buffer3.str();
-				jsonReturn[L"weight"] = json::value::string(utility::conversions::to_utf16string(text));
-
-				std::stringstream buffer4;
-				old = std::cout.rdbuf(buffer4.rdbuf());
-				cout << it->get(6);
-				text = buffer4.str();
-				jsonReturn[L"height"] = json::value::string(utility::conversions::to_utf16string(text));
-
-				std::stringstream buffer5;
-				old = std::cout.rdbuf(buffer5.rdbuf());
-				cout << it->get(7);
-				text = buffer5.str();
-				jsonReturn[L"age"] = json::value::string(utility::conversions::to_utf16string(text));
-
-				std::stringstream buffer6;
-				old = std::cout.rdbuf(buffer6.rdbuf());
-				cout << it->get(8);
-				text = buffer6.str();
-				jsonReturn[L"bmi"] = json::value::string(utility::conversions::to_utf16string(text));
-
-				std::stringstream buffer7;
-				old = std::cout.rdbuf(buffer7.rdbuf());
-				cout << it->get(9);
-				text = buffer7.str();
-				jsonReturn[L"diet_plan_id"] = json::value::string(utility::conversions::to_utf16string(text));
-
-				std::stringstream buffer8;
-				old = std::cout.rdbuf(buffer8.rdbuf());
-				cout << it->get(10);
-				text = buffer8.str();
-				jsonReturn[L"diet_restriction"] = json::value::string(utility::conversions::to_utf16string(text));
-
-				std::stringstream buffer9;
-				old = std::cout.rdbuf(buffer9.rdbuf());
-				cout << it->get(11);
-				text = buffer9.str();
-				jsonReturn[L"activity_level"] = json::value::string(utility::conversions::to_utf16string(text));
-
-				std::stringstream buffer10;
-				old = std::cout.rdbuf(buffer10.rdbuf());
-				cout << it->get(12);
-				text = buffer10.str();
-				jsonReturn[L"gender"] = json::value::string(utility::conversions::to_utf16string(text));
-
-				std::stringstream buffer11;
-				old = std::cout.rdbuf(buffer11.rdbuf());
-				cout << it->get(13);
-				text = buffer11.str();
-				jsonReturn[L"survey_time_taken"] = json::value::string(utility::conversions::to_utf16string(text));
+				jsonReturn[L"first_name"] = json::value::string(utility::conversions::to_utf16string(it->get(3).operator std::string().c_str()));
+				jsonReturn[L"last_name"] = json::value::string(utility::conversions::to_utf16string(it->get(4).operator std::string().c_str()));
+				jsonReturn[L"weight"] = json::value::number(it->get(5).operator int());
+				jsonReturn[L"height"] = json::value::string(utility::conversions::to_utf16string(it->get(6).operator std::string().c_str()));
+				jsonReturn[L"age"] = json::value::number(it->get(7).operator int());
+				jsonReturn[L"bmi"] = json::value::number(it->get(8).operator float());
+				jsonReturn[L"diet_plan_id"] = json::value::number(it->get(9).operator int());
+				jsonReturn[L"diet_restriction"] = json::value::number(it->get(10).operator int());
+				jsonReturn[L"activity_level"] = json::value::string(utility::conversions::to_utf16string(it->get(11).operator std::string().c_str()));
+				jsonReturn[L"gender"] = json::value::string(utility::conversions::to_utf16string(it->get(12).operator std::string().c_str()));
 
 				res.set_body(jsonReturn);
 
-				json::value response = res.extract_json(false).get();
-
-				ucout << "Server succefully returned JSON of user info" << endl;
-
-				message.reply(status_codes::OK, response);
+				response = res.extract_json(false).get();
 			}
-			message.reply(status_codes::NotFound);
+
+			ucout << "Server succefully returned JSON of user info" << endl;
+			message.reply(status_codes::OK, response);
 		}
 		catch (const Error & err)
 		{
