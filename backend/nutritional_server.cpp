@@ -546,7 +546,11 @@ json::value jsonCreateFromDiet(Row firstDiet, Row secondDiet) {
 
 	result[L"firstDiet"][L"DietName"] = json::value::number(firstDiet.get(0).operator int());
 	result[L"firstDiet"][L"calorie_count"] = json::value::number(firstDiet.get(1).operator int());
+<<<<<<< HEAD
 	result[L"firstDiet"][L"dietary_restrictions"] = json::value::number(firstDiet.get(3).operator int());
+=======
+	result[L"firstDiet"][L"dietary_restrictions"] = json::value::number(firstDiet.get(2).operator int());
+>>>>>>> b0a395de466cfdb71dca0761debe1b9182c76bd5
 	result[L"firstDiet"][L"breakfast"] = json::value::string(utility::conversions::to_utf16string(firstDiet.get(3).operator std::string().c_str()));
 	result[L"firstDiet"][L"lunch"] = json::value::string(utility::conversions::to_utf16string(firstDiet.get(4).operator std::string().c_str()));
 	result[L"firstDiet"][L"dinner"] = json::value::string(utility::conversions::to_utf16string(firstDiet.get(5).operator std::string().c_str()));

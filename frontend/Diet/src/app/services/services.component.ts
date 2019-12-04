@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import {FormControl} from '@angular/forms';
-import {Observable} from 'rxjs';
-import {map, startWith, take} from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
+import { FormControl } from '@angular/forms';
+import { Observable } from 'rxjs';
+import { map, startWith, take, catchError } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { throwError } from 'rxjs';
 
 @Component({
   selector: 'app-services',
@@ -21,10 +22,14 @@ options: string[] = [];
 
   ngOnInit() {
     // *************** INSERT URL HERE ****************
-    this.http.get("http://localhost:3000/food").pipe(take(1)).subscribe(food => {
+    this.http.get('http://localhost:4201/NutritionalLookup?search=', { headers: new HttpHeaders({
+      source: 'lookup',
+      user: '',
+      password: ''
+    })}).pipe(catchError(this.handleError)).pipe(take(1)).subscribe(food => {
         this.food = Object.values(food);
         Object.values(food).forEach(item => {
-          this.options.push(item.name);
+          this.options.push(item.food_name);
         });
         this.filteredOptions = this.myControl.valueChanges
           .pipe(
@@ -42,9 +47,14 @@ options: string[] = [];
 
   doSomething(selection) {
     this.food.forEach(item => {
-      if(item.name == selection) {
+      if(item.food_name == selection) {
         this.selection = item;
       }
     });
   }
+
+  handleError(error: HttpErrorResponse) {
+     alert("Couldn't retrieve food items!");
+     return throwError('');
+   }
 }

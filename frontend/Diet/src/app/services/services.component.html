@@ -12,11 +12,15 @@
           </mat-autocomplete>
         </mat-form-field>
         <div style="padding: 50px; background-color: rgba(63, 81, 181, .5)" *ngIf="selection" class="mat-elevation-z2" fxFlex="90">
-          <h2 class="mat-h2">{{selection.name}}</h2>
+          <h2 class="mat-h2">{{selection.food_name}}</h2>
+          <p class="mat-body"><b>Serving Size: </b>{{selection.serving_size}}</p>
           <p class="mat-body"><b>Calories: </b>{{selection.calories}}</p>
-          <p class="mat-body"><b>Fat: </b>{{selection.fat}} grams</p>
-          <p class="mat-body"><b>Protein: </b>{{selection.protein}} grams</p>
-          <p class="mat-body"><b>Carbs: </b>{{selection.carbs}} grams</p>
+          <p class="mat-body"><b>Fat: </b>{{selection.total_fat}}</p>
+          <p class="mat-body"><b>Protein: </b>{{selection.protein}}</p>
+          <p class="mat-body"><b>Carbohydrates: </b>{{selection.carbohydrates}}</p>
+          <p class="mat-body"><b>Cholesterol: </b>{{selection.cholesterol}}</p>
+          <p class="mat-body"><b>Sodium: </b>{{selection.sodium}}</p>
+          <p class="mat-body"><b>Sugars: </b>{{selection.sugars}}</p>
         </div>
     </form>
 </div>
