@@ -1,5 +1,9 @@
 Directory for Back-End code and documentation
 
+Databases
+---------
+To properly run sql scripts to create tables, import the scripts inside of the folder to a local database with port 33060
+
 Frameworks
 ----------
 
